@@ -115,7 +115,7 @@ fi
 echo ""
 echo "Useful commands:"
 echo "  View logs:         docker-compose logs -f [service_name]"
-echo "  Stop services:     docker-compose down"
+echo "  Stop services:     ./stop.sh"
 echo "  Check status:      docker-compose ps"
 echo ""
 

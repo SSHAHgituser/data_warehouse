@@ -4,17 +4,9 @@ dbt (data build tool) project for transforming data in the PostgreSQL data wareh
 
 ## Quick Start
 
-The dbt documentation server is configured in the root `docker-compose.yml`. To start it:
+The dbt documentation server is automatically started with `./start.sh` from the repository root. Access it at `http://localhost:8080`.
 
-```bash
-# From project root - start all services
-docker-compose up -d
-
-# Or start just dbt-docs (PostgreSQL must be running first)
-docker-compose up -d dbt-docs
-```
-
-Access the documentation at `http://localhost:8080` (or the port specified in `DBT_DOCS_PORT` environment variable).
+For manual startup, see the [main README](../README.md#step-by-step-setup).
 
 ## Local Development
 
@@ -92,18 +84,9 @@ cd dbt
 
 ## Docker Documentation Server
 
-The dbt docs can be hosted in a Docker container. The container automatically generates docs on startup and serves them via nginx.
+The dbt documentation is served via Docker container (see `docker-compose.yml`). The container automatically generates docs on startup and serves them via nginx.
 
-**Using Docker Compose:**
-```bash
-docker-compose up -d dbt-docs
-```
-
-**Docker Commands:**
-- View logs: `docker-compose logs -f dbt-docs`
-- Stop: `docker-compose stop dbt-docs`
-- Restart: `docker-compose restart dbt-docs`
-- Rebuild: `docker-compose build dbt-docs`
+For Docker commands, see the [main README](../README.md#stopping-services).
 
 ## Project Structure
 

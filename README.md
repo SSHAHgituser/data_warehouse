@@ -72,6 +72,8 @@ docker-compose logs -f dbt-docs
 
 ## Step-by-Step Setup
 
+The `./start.sh` script automates all of this, but here's the manual process:
+
 ### 1. Start PostgreSQL
 
 ```bash
@@ -102,9 +104,7 @@ docker exec -it data_warehouse_postgres psql -U postgres -d data_warehouse
 docker-compose up -d streamlit
 ```
 
-The Streamlit dashboard will be available at `http://localhost:8501` (or the port specified in `STREAMLIT_PORT` environment variable).
-
-**Note:** Streamlit depends on PostgreSQL, so ensure PostgreSQL is running first.
+Access at `http://localhost:8501` (or the port specified in `STREAMLIT_PORT`).
 
 ### 3. Start dbt Documentation Server
 
@@ -112,9 +112,9 @@ The Streamlit dashboard will be available at `http://localhost:8501` (or the por
 docker-compose up -d dbt-docs
 ```
 
-The dbt documentation will be available at `http://localhost:8080` (or the port specified in `DBT_DOCS_PORT` environment variable).
+Access at `http://localhost:8080` (or the port specified in `DBT_DOCS_PORT`).
 
-**Note:** The dbt-docs service will automatically generate documentation on startup. It depends on PostgreSQL being healthy.
+**Note:** The dbt-docs service automatically generates documentation on startup.
 
 ### 4. Airbyte Setup
 
@@ -144,7 +144,7 @@ The Airbyte web UI will be available at `http://localhost:8000`.
 
 ### 5. (Optional) Install Adventure Works Sample Data
 
-To install the Adventure Works sample database:
+The `./start.sh` script automatically installs AdventureWorks if it doesn't exist. To install manually:
 
 ```bash
 ./adventureworks/install_adventureworks.sh
@@ -154,6 +154,8 @@ This will:
 1. Start PostgreSQL if not running
 2. Download and install the Adventure Works database
 3. Create the `Adventureworks` database
+
+See [adventureworks/README.md](adventureworks/README.md) for detailed installation instructions.
 
 ## Environment Variables
 
@@ -221,43 +223,14 @@ data_warehouse/
     └── troubleshooting.md      # Troubleshooting guide
 ```
 
-### Why Airbyte is Not in Docker Compose
+## Component Documentation
 
-Airbyte is **not** included in `docker-compose.yml` for several important reasons:
+Each component has its own README with component-specific details:
 
-1. **Docker Compose Deprecated**: Airbyte officially deprecated Docker Compose deployments in version 1.0 (September 2024). It's no longer supported or maintained.
-
-2. **Images Not on Docker Hub**: Airbyte doesn't publish pre-built images to Docker Hub. The images (`airbyte/server`, `airbyte/worker`, `airbyte/scheduler`) don't exist there. They're only available via Helm charts from GitHub Container Registry.
-
-3. **Official Method**: `abctl` is the only officially supported local deployment method. It:
-   - Uses Kubernetes (via `kind`) for orchestration
-   - Automatically pulls images from the correct registry (ghcr.io)
-   - Handles all configuration via Helm charts
-   - Gets automatic updates and support
-
-4. **Better Experience**: `abctl` is simpler and more reliable:
-   - One command: `abctl local install`
-   - Automatic image management
-   - No manual image building required
-   - Official support and updates
-
-**For Airbyte setup, use:**
-```bash
-cd airbyte
-./setup_with_abctl.sh
-```
-
-See [airbyte/README.md](airbyte/README.md) for detailed explanation of why `abctl` works but Docker Compose doesn't.
-
-## Development
-
-### Working with dbt
-
-See [dbt/README.md](dbt/README.md) for detailed dbt setup and usage instructions.
-
-### Working with Streamlit
-
-See [streamlit/README.md](streamlit/README.md) for Streamlit development instructions.
+- **[dbt/README.md](dbt/README.md)** - dbt project setup, local development, and usage
+- **[streamlit/README.md](streamlit/README.md)** - Streamlit dashboard development
+- **[adventureworks/README.md](adventureworks/README.md)** - AdventureWorks database installation
+- **[airbyte/README.md](airbyte/README.md)** - Airbyte setup and troubleshooting
 
 ## Troubleshooting
 
@@ -292,10 +265,10 @@ docker-compose up -d --build [service_name]
 
 ## Additional Resources
 
-- [dbt Documentation](dbt/README.md)
-- [Streamlit Documentation](streamlit/README.md)
-- [Adventure Works Installation](adventureworks/README.md)
-- [Airbyte Setup](airbyte/README.md)
+- [dbt Documentation](dbt/README.md) - dbt project details
+- [Streamlit Documentation](streamlit/README.md) - Dashboard development
+- [Adventure Works Installation](adventureworks/README.md) - Sample database setup
+- [Airbyte Setup](airbyte/README.md) - Data integration platform
 
 ## License
 

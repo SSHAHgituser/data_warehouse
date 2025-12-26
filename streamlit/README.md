@@ -1,20 +1,12 @@
 # Streamlit Dashboard
 
-A Streamlit dashboard for the data warehouse project.
+A Streamlit dashboard for visualizing and exploring data warehouse data.
 
 ## Quick Start
 
-The Streamlit app is configured in the root `docker-compose.yml`. To start it:
+The Streamlit app is automatically started with `./start.sh` from the repository root. Access it at `http://localhost:8501`.
 
-```bash
-# From project root - start all services
-docker-compose up -d
-
-# Or start just Streamlit (PostgreSQL must be running first)
-docker-compose up -d streamlit
-```
-
-Access the dashboard at `http://localhost:8501` (or the port specified in `STREAMLIT_PORT` environment variable).
+For manual startup, see the [main README](../README.md#step-by-step-setup).
 
 ## Local Development
 
@@ -43,20 +35,15 @@ source venv/bin/activate
 streamlit run app.py
 ```
 
-## Docker Commands
-
-- **View logs**: `docker-compose logs -f streamlit`
-- **Stop**: `docker-compose stop streamlit`
-- **Restart**: `docker-compose restart streamlit`
-- **Rebuild**: `docker-compose build streamlit`
-
 ## Configuration
 
-Customize the port using environment variables:
+Customize the port using environment variables in `.env` or `docker-compose.yml`:
 
 ```bash
-STREAMLIT_PORT=8502 docker-compose up -d streamlit
+STREAMLIT_PORT=8502
 ```
+
+For Docker commands, see the [main README](../README.md#stopping-services).
 
 ## Dependencies
 
