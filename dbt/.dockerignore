@@ -1,0 +1,64 @@
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Git
+.git/
+.gitignore
+
+# Scripts (not needed in container after build)
+setup_venv.sh
+run_dbt.sh
+generate_docs.sh
+setup_schema.sh
+
+# Documentation
+README.md
+*.md
+
+# dbt packages (will be installed in container)
+dbt_packages/
+
+# Keep target directory - it contains the generated docs
+# But we'll copy it in the Dockerfile
+

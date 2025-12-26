@@ -44,6 +44,34 @@ services:
     depends_on:
       - postgres
 
+  dbt-docs:
+    build:
+      context: ./dbt
+      dockerfile: Dockerfile
+    container_name: data_warehouse_dbt_docs
+    restart: unless-stopped
+    ports:
+      - "${DBT_DOCS_PORT:-8080}:80"
+    environment:
+      - DBT_HOST=postgres
+      - DBT_PORT=5432
+      - DBT_USER=${POSTGRES_USER:-postgres}
+      - DBT_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DBT_DBNAME=${POSTGRES_DB:-data_warehouse}
+      - DBT_SCHEMA=dbt
+      - WAIT_FOR_DB=true
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - data_warehouse_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:
     driver: local

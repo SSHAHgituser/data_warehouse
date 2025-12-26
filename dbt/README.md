@@ -157,11 +157,16 @@ dbt test
 
 ### Generate Documentation
 
+#### Local Generation
+
 ```bash
 # Generate docs
 ./run_dbt.sh docs generate
 
-# Serve docs
+# Or use the dedicated script
+./generate_docs.sh
+
+# Serve docs locally
 ./run_dbt.sh docs serve
 
 # Or with venv activated
@@ -170,6 +175,52 @@ export DBT_PROFILES_DIR=.
 dbt docs generate
 dbt docs serve
 ```
+
+#### Docker Deployment
+
+The dbt docs can be hosted in a Docker container. The container will automatically generate docs on startup and serve them via nginx.
+
+**Using Docker Compose (Recommended):**
+
+```bash
+# From project root - run dbt-docs service
+docker-compose up -d dbt-docs
+
+# Or run all services together
+docker-compose up -d
+```
+
+The docs will be available at `http://localhost:8080` (or the port specified in `DBT_DOCS_PORT` environment variable).
+
+**Using Docker directly:**
+
+```bash
+cd dbt
+
+# Build the image
+docker build -t dbt-docs .
+
+# Run the container
+docker run -d \
+  -p 8080:80 \
+  -e DBT_HOST=host.docker.internal \
+  -e DBT_PORT=5432 \
+  -e DBT_USER=postgres \
+  -e DBT_PASSWORD=postgres \
+  -e DBT_DBNAME=data_warehouse \
+  -e DBT_SCHEMA=dbt \
+  --name dbt-docs \
+  dbt-docs
+```
+
+**Docker Commands:**
+
+- View logs: `docker-compose logs -f dbt-docs` or `docker logs -f dbt-docs`
+- Stop container: `docker-compose stop dbt-docs` or `docker stop dbt-docs`
+- Restart container: `docker-compose restart dbt-docs` or `docker restart dbt-docs`
+- Rebuild after changes: `docker-compose build dbt-docs` or `docker build -t dbt-docs .`
+
+**Note:** The Docker container generates docs at startup. If you want to serve pre-generated docs, generate them locally first using `./generate_docs.sh`, then the container will use the existing docs if generation fails.
 
 ### Seed Data
 
