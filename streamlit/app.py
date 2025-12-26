@@ -117,7 +117,7 @@ df = pd.DataFrame({
     'Date': pd.date_range(start=start_date, periods=20, freq='D')
 })
 
-st.dataframe(df, use_container_width=True)
+st.dataframe(df, width="wide")
 
 # Download button
 csv = df.to_csv(index=False)
