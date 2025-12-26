@@ -4,14 +4,22 @@ This folder contains all AdventureWorks-related files and documentation.
 
 ## Files
 
+- **install_adventureworks.sh** - Installation script for the AdventureWorks sample database
 - **ADVENTUREWORKS_INSTALL.md** - Complete installation guide for the AdventureWorks sample database
 - **cleanup_empty_schemas.sql** - SQL script to remove empty schemas created during installation
 
 ## Installation
 
-To install AdventureWorks, run the installation script from the repository root:
+To install AdventureWorks, run the installation script:
 
+**From the repository root:**
 ```bash
+./adventureworks/install_adventureworks.sh
+```
+
+**Or from this directory:**
+```bash
+cd adventureworks
 ./install_adventureworks.sh
 ```
 

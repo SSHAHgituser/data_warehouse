@@ -7,6 +7,8 @@ set -e
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get the project root directory (parent of adventureworks)
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 echo "🚀 Starting Adventure Works installation..."
 
@@ -19,6 +21,7 @@ NC='\033[0m' # No Color
 echo -e "${YELLOW}Checking if PostgreSQL container is running...${NC}"
 if ! docker ps | grep -q data_warehouse_postgres; then
     echo "❌ PostgreSQL container is not running. Starting it..."
+    cd "$PROJECT_ROOT"
     docker-compose up -d postgres
     echo "⏳ Waiting for PostgreSQL to be ready..."
     sleep 5
@@ -65,7 +68,7 @@ echo "This may take several minutes..."
 docker exec -i data_warehouse_postgres psql -U postgres -d Adventureworks < install.sql
 
 echo -e "${YELLOW}Step 7: Cleaning up empty schemas...${NC}"
-docker exec -i data_warehouse_postgres psql -U postgres -d Adventureworks < "${SCRIPT_DIR}/adventureworks/cleanup_empty_schemas.sql"
+docker exec -i data_warehouse_postgres psql -U postgres -d Adventureworks < "${SCRIPT_DIR}/cleanup_empty_schemas.sql"
 echo -e "${GREEN}✓ Empty schemas cleaned up${NC}"
 
 echo -e "${GREEN}✓ Adventure Works database installed successfully!${NC}"

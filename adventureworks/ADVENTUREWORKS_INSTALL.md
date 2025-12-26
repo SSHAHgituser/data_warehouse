@@ -12,9 +12,16 @@ This guide provides step-by-step instructions to install the Adventure Works sam
 
 ## Quick Installation (Automated)
 
-Run the installation script from the repository root:
+Run the installation script:
 
+**From the repository root:**
 ```bash
+./adventureworks/install_adventureworks.sh
+```
+
+**Or from the adventureworks directory:**
+```bash
+cd adventureworks
 chmod +x install_adventureworks.sh
 ./install_adventureworks.sh
 ```
@@ -176,7 +183,7 @@ docker-compose up -d postgres
 If you encounter permission issues, ensure the script is executable:
 
 ```bash
-chmod +x install_adventureworks.sh
+chmod +x adventureworks/install_adventureworks.sh
 ```
 
 ## Resources

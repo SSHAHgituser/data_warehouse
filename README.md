@@ -142,7 +142,7 @@ The Airbyte web UI will be available at `http://localhost:8000`.
 To install the Adventure Works sample database:
 
 ```bash
-./install_adventureworks.sh
+./adventureworks/install_adventureworks.sh
 ```
 
 This will:
@@ -195,6 +195,9 @@ data_warehouse/
 │   ├── app.py                  # Main dashboard application
 │   └── README.md               # Streamlit-specific documentation
 ├── adventureworks/             # Adventure Works installation files
+│   ├── install_adventureworks.sh  # Installation script
+│   ├── cleanup_empty_schemas.sql  # Cleanup script
+│   └── README.md               # Adventure Works documentation
 └── airbyte/                    # Airbyte Core setup
     ├── README.md               # Airbyte setup instructions
     ├── setup_with_abctl.sh     # Official Airbyte setup script
