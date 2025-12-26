@@ -25,6 +25,11 @@ All services are configured in `docker-compose.yml`. Start them with:
 ./start.sh
 ```
 
+**To stop all services:**
+```bash
+./stop.sh
+```
+
 **Option 2: Using Docker Compose directly**
 ```bash
 # Start all services
@@ -170,6 +175,13 @@ DBT_DOCS_PORT=8080
 
 ## Stopping Services
 
+**Option 1: Using the stop script (recommended)**
+```bash
+./stop.sh
+```
+This will stop all services including Airbyte (if running).
+
+**Option 2: Using Docker Compose directly**
 ```bash
 # Stop all services
 docker-compose down
@@ -179,6 +191,11 @@ docker-compose stop [service_name]
 
 # Stop and remove volumes (⚠️ deletes data)
 docker-compose down -v
+```
+
+**To stop Airbyte separately:**
+```bash
+abctl local stop
 ```
 
 ## Project Structure
