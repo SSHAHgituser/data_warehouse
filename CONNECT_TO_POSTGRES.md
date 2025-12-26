@@ -1,5 +1,7 @@
 # Connecting to PostgreSQL Database
 
+> **Note:** For information on starting PostgreSQL and other services, see the [main README](README.md).
+
 This guide shows you different ways to connect to your PostgreSQL database running in Docker.
 
 ## Connection Details

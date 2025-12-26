@@ -1,16 +1,27 @@
 # Streamlit Dashboard
 
-A simple standard Streamlit dashboard for the data warehouse project.
+A Streamlit dashboard for the data warehouse project.
 
-## Setup
+## Quick Start
 
-### 1. Create and activate virtual environment
+The Streamlit app is configured in the root `docker-compose.yml`. To start it:
 
-Run the setup script to create a virtual environment and install dependencies:
+```bash
+# From project root - start all services
+docker-compose up -d
+
+# Or start just Streamlit (PostgreSQL must be running first)
+docker-compose up -d streamlit
+```
+
+Access the dashboard at `http://localhost:8501` (or the port specified in `STREAMLIT_PORT` environment variable).
+
+## Local Development
+
+### Setup Virtual Environment
 
 ```bash
 cd streamlit
-chmod +x setup_venv.sh
 ./setup_venv.sh
 ```
 
@@ -24,9 +35,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 2. Run the dashboard
-
-Activate the virtual environment and run Streamlit:
+### Run Locally
 
 ```bash
 cd streamlit
@@ -34,48 +43,16 @@ source venv/bin/activate
 streamlit run app.py
 ```
 
-The dashboard will open in your default web browser at `http://localhost:8501`
+## Docker Commands
 
-## Docker Deployment
+- **View logs**: `docker-compose logs -f streamlit`
+- **Stop**: `docker-compose stop streamlit`
+- **Restart**: `docker-compose restart streamlit`
+- **Rebuild**: `docker-compose build streamlit`
 
-### Option 1: Using Docker Compose (Recommended)
+## Configuration
 
-The Streamlit app is configured in the root `docker-compose.yml`. To run it:
-
-```bash
-# From the project root directory
-docker-compose up -d streamlit
-```
-
-Or to run both PostgreSQL and Streamlit together:
-
-```bash
-docker-compose up -d
-```
-
-The Streamlit app will be available at `http://localhost:8501` (or the port specified in `STREAMLIT_PORT` environment variable).
-
-### Option 2: Using Docker directly
-
-Build and run the container:
-
-```bash
-cd streamlit
-docker build -t data-warehouse-streamlit .
-docker run -d -p 8501:8501 --name streamlit-app data-warehouse-streamlit
-```
-
-### Docker Commands
-
-- **View logs**: `docker-compose logs -f streamlit` or `docker logs -f streamlit-app`
-- **Stop container**: `docker-compose stop streamlit` or `docker stop streamlit-app`
-- **Restart container**: `docker-compose restart streamlit` or `docker restart streamlit-app`
-- **Remove container**: `docker-compose down streamlit` or `docker rm -f streamlit-app`
-- **Rebuild after changes**: `docker-compose build streamlit` or `docker build -t data-warehouse-streamlit .`
-
-### Environment Variables
-
-You can customize the Streamlit port by setting the `STREAMLIT_PORT` environment variable:
+Customize the port using environment variables:
 
 ```bash
 STREAMLIT_PORT=8502 docker-compose up -d streamlit
@@ -83,25 +60,22 @@ STREAMLIT_PORT=8502 docker-compose up -d streamlit
 
 ## Dependencies
 
-All package dependencies are tracked in `requirements.txt`:
+See `requirements.txt` for package dependencies:
 - `streamlit` - The Streamlit framework
-- `pandas` - Data manipulation and analysis
+- `pandas` - Data manipulation
 - `numpy` - Numerical computing
 
 ## Features
 
-The dashboard includes:
-- 📊 Key metrics cards
-- 📈 Interactive charts (line and bar charts)
-- 📋 Data tables with download functionality
-- ⚙️ Sidebar configuration and filters
-- 📅 Date range selectors
+- Key metrics cards
+- Interactive charts
+- Data tables with download functionality
+- Sidebar configuration and filters
+- Date range selectors
 
-## Development
+## Adding Dependencies
 
-To add new dependencies:
-
-1. Install the package in your virtual environment:
+1. Install in virtual environment:
    ```bash
    source venv/bin/activate
    pip install <package-name>
@@ -112,5 +86,4 @@ To add new dependencies:
    pip freeze > requirements.txt
    ```
 
-Or manually add the package to `requirements.txt` with the version number.
-
+For more information about the overall project setup, see the [main README](../README.md).

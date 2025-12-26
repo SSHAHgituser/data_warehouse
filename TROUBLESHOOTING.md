@@ -1,5 +1,7 @@
 # Troubleshooting: Can't See Databases
 
+> **Note:** For information on starting services and general setup, see the [main README](README.md).
+
 If you can't see the databases in your GUI tool, follow these steps:
 
 ## Step 1: Verify Databases Exist
