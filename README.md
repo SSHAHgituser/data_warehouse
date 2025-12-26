@@ -6,7 +6,7 @@ A modern data stack that can be quickly deployed and is ready to scale. This rep
 - **Adventure Works**: Sample dataset from Microsoft
 - **dbt Core**: Data transformation
 - **Streamlit**: Interactive dashboards
-- **Airbyte**: Extract and Load (planned)
+- **Airbyte**: Extract and Load (via `abctl` - see [Airbyte Setup](#airbyte-setup))
 
 ## Quick Start
 
@@ -14,6 +14,7 @@ A modern data stack that can be quickly deployed and is ready to scale. This rep
 
 - Docker and Docker Compose installed
 - Git (for Adventure Works installation)
+- For Airbyte: 8GB+ RAM, 4+ CPUs recommended
 
 ### Starting All Services
 
@@ -46,6 +47,8 @@ Once started, access the services at:
 - **Streamlit Dashboard**: `http://localhost:8501`
 
 - **dbt Documentation**: `http://localhost:8080`
+
+- **Airbyte Web UI**: `http://localhost:8000` (see [Airbyte Setup](#airbyte-setup) below)
 
 ### Verify Services are Running
 
@@ -108,7 +111,33 @@ The dbt documentation will be available at `http://localhost:8080` (or the port 
 
 **Note:** The dbt-docs service will automatically generate documentation on startup. It depends on PostgreSQL being healthy.
 
-### 4. (Optional) Install Adventure Works Sample Data
+### 4. Airbyte Setup
+
+Airbyte is **not** included in `docker-compose.yml` because:
+
+- **Docker Compose is deprecated**: Airbyte deprecated Docker Compose in version 1.0 (September 2024)
+- **Images not available**: Airbyte doesn't publish images to Docker Hub - they're only available via Helm charts
+- **Official method**: `abctl` is the only officially supported local deployment method
+- **Better experience**: `abctl` handles everything automatically (Kubernetes, Helm charts, image management)
+
+**To install Airbyte:**
+
+```bash
+cd airbyte
+./setup_with_abctl.sh
+```
+
+This will:
+1. Install `abctl` if needed
+2. Set up Airbyte using Kubernetes (via `kind`)
+3. Deploy using Helm charts
+4. Provide you with credentials
+
+The Airbyte web UI will be available at `http://localhost:8000`.
+
+**Note:** Airbyte requires significant resources (recommended: 8GB+ RAM, 4+ CPUs). See [airbyte/README.md](airbyte/README.md) for detailed setup and troubleshooting.
+
+### 5. (Optional) Install Adventure Works Sample Data
 
 To install the Adventure Works sample database:
 
@@ -156,7 +185,7 @@ docker-compose down -v
 
 ```
 data_warehouse/
-├── docker-compose.yml          # Service orchestration
+├── docker-compose.yml          # Core services (postgres, streamlit, dbt-docs)
 ├── postgres/                   # PostgreSQL configuration (if any)
 ├── dbt/                        # dbt project
 │   ├── models/                 # SQL models
@@ -166,8 +195,39 @@ data_warehouse/
 │   ├── app.py                  # Main dashboard application
 │   └── README.md               # Streamlit-specific documentation
 ├── adventureworks/             # Adventure Works installation files
-└── airbyte/                    # Airbyte configuration (planned)
+└── airbyte/                    # Airbyte Core setup
+    ├── README.md               # Airbyte setup instructions
+    ├── setup_with_abctl.sh     # Official Airbyte setup script
+    └── troubleshooting.md      # Troubleshooting guide
 ```
+
+### Why Airbyte is Not in Docker Compose
+
+Airbyte is **not** included in `docker-compose.yml` for several important reasons:
+
+1. **Docker Compose Deprecated**: Airbyte officially deprecated Docker Compose deployments in version 1.0 (September 2024). It's no longer supported or maintained.
+
+2. **Images Not on Docker Hub**: Airbyte doesn't publish pre-built images to Docker Hub. The images (`airbyte/server`, `airbyte/worker`, `airbyte/scheduler`) don't exist there. They're only available via Helm charts from GitHub Container Registry.
+
+3. **Official Method**: `abctl` is the only officially supported local deployment method. It:
+   - Uses Kubernetes (via `kind`) for orchestration
+   - Automatically pulls images from the correct registry (ghcr.io)
+   - Handles all configuration via Helm charts
+   - Gets automatic updates and support
+
+4. **Better Experience**: `abctl` is simpler and more reliable:
+   - One command: `abctl local install`
+   - Automatic image management
+   - No manual image building required
+   - Official support and updates
+
+**For Airbyte setup, use:**
+```bash
+cd airbyte
+./setup_with_abctl.sh
+```
+
+See [airbyte/README.md](airbyte/README.md) for detailed explanation of why `abctl` works but Docker Compose doesn't.
 
 ## Development
 
@@ -215,6 +275,7 @@ docker-compose up -d --build [service_name]
 - [dbt Documentation](dbt/README.md)
 - [Streamlit Documentation](streamlit/README.md)
 - [Adventure Works Installation](adventureworks/README.md)
+- [Airbyte Setup](airbyte/README.md)
 
 ## License
 

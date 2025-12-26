@@ -2,6 +2,8 @@
 
 # Data Warehouse Stack Startup Script
 # This script starts all services in the correct order
+# 
+# Note: Airbyte is not included. Use ./airbyte/setup_with_abctl.sh for Airbyte setup.
 
 set -e
 
@@ -50,6 +52,9 @@ echo "Service URLs:"
 echo "  📊 PostgreSQL:     localhost:5432"
 echo "  📈 Streamlit:      http://localhost:8501"
 echo "  📚 dbt Docs:       http://localhost:8080"
+echo ""
+echo "For Airbyte setup:"
+echo "  cd airbyte && ./setup_with_abctl.sh"
 echo ""
 echo "Useful commands:"
 echo "  View logs:         docker-compose logs -f [service_name]"
