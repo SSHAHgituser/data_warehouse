@@ -1,0 +1,6 @@
+# dbt and PostgreSQL adapter
+dbt-postgres>=1.7.0
+
+# Optional: Additional useful packages
+# dbt-utils>=1.1.0  # Uncomment if you want dbt-utils macros
+

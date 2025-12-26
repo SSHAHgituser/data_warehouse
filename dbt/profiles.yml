@@ -1,0 +1,30 @@
+# dbt profiles.yml
+# 
+# This file configures the connection to the PostgreSQL data_warehouse database.
+# 
+# Location options:
+# 1. Keep in project folder (for development): dbt --profiles-dir . debug
+# 2. Copy to ~/.dbt/profiles.yml (standard location)
+# 3. Use environment variables for sensitive data (see README.md)
+#
+# Connection Details:
+# - Database: data_warehouse
+# - Default Schema: dbt
+# - Host: localhost (PostgreSQL running in Docker)
+
+data_warehouse:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      user: postgres
+      password: postgres  # For production, use environment variable or secrets manager
+      port: 5432
+      dbname: data_warehouse
+      schema: dbt
+      threads: 4
+      keepalives_idle: 0
+      connect_timeout: 10
+      search_path: dbt  # Optional: set default search path
+
