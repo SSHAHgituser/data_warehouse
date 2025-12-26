@@ -179,10 +179,6 @@ See [dbt/README.md](dbt/README.md) for detailed dbt setup and usage instructions
 
 See [streamlit/README.md](streamlit/README.md) for Streamlit development instructions.
 
-### Connecting to PostgreSQL
-
-See [CONNECT_TO_POSTGRES.md](CONNECT_TO_POSTGRES.md) for various ways to connect to the database.
-
 ## Troubleshooting
 
 ### Services Won't Start
@@ -204,10 +200,6 @@ See [CONNECT_TO_POSTGRES.md](CONNECT_TO_POSTGRES.md) for various ways to connect
    docker ps
    ```
 
-### Database Connection Issues
-
-See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common database connection problems.
-
 ### Rebuild Services After Changes
 
 ```bash
@@ -220,8 +212,6 @@ docker-compose up -d --build [service_name]
 
 ## Additional Resources
 
-- [PostgreSQL Connection Guide](CONNECT_TO_POSTGRES.md)
-- [Troubleshooting Guide](TROUBLESHOOTING.md)
 - [dbt Documentation](dbt/README.md)
 - [Streamlit Documentation](streamlit/README.md)
 - [Adventure Works Installation](adventureworks/README.md)
