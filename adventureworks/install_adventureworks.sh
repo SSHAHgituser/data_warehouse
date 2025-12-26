@@ -63,11 +63,20 @@ docker exec -i data_warehouse_postgres psql -U postgres -c "CREATE DATABASE \"Ad
     echo -e "${YELLOW}⚠ Database may already exist, continuing...${NC}"
 }
 
-echo -e "${YELLOW}Step 6: Installing database schema and loading data...${NC}"
-echo "This may take several minutes..."
-docker exec -i data_warehouse_postgres psql -U postgres -d Adventureworks < install.sql
+echo -e "${YELLOW}Step 6: Copying CSV files and install script into PostgreSQL container...${NC}"
+# Create a directory in the container for AdventureWorks files
+docker exec data_warehouse_postgres mkdir -p /tmp/adventureworks_data
+# Copy all files (including CSV and install.sql) into the container
+docker cp . data_warehouse_postgres:/tmp/adventureworks_data/
+echo -e "${GREEN}✓ Files copied${NC}"
 
-echo -e "${YELLOW}Step 7: Cleaning up empty schemas...${NC}"
+echo -e "${YELLOW}Step 7: Installing database schema and loading data...${NC}"
+echo "This may take several minutes..."
+# Run install.sql from inside the container where CSV files are accessible
+# The \copy commands in install.sql use relative paths, so we need to run from that directory
+docker exec -w /tmp/adventureworks_data data_warehouse_postgres psql -U postgres -d Adventureworks -f install.sql
+
+echo -e "${YELLOW}Step 8: Cleaning up empty schemas...${NC}"
 docker exec -i data_warehouse_postgres psql -U postgres -d Adventureworks < "${SCRIPT_DIR}/cleanup_empty_schemas.sql"
 echo -e "${GREEN}✓ Empty schemas cleaned up${NC}"
 
@@ -82,6 +91,8 @@ echo "  psql -h localhost -p 5432 -U postgres -d Adventureworks"
 # Cleanup
 cd /
 rm -rf "$TEMP_DIR"
+# Clean up files from container
+docker exec data_warehouse_postgres rm -rf /tmp/adventureworks_data 2>/dev/null || true
 
 echo -e "${GREEN}🎉 Installation complete!${NC}"
 
