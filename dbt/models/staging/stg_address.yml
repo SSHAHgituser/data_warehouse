@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stg_address
+    description: "Staging model for address table from public schema"
+    columns:
+      - name: city
+        description: "city (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: addressid
+        description: "addressid (bigint, nullable)"
+      - name: postalcode
+        description: "postalcode (character varying, nullable)"
+      - name: addressline1
+        description: "addressline1 (character varying, nullable)"
+      - name: addressline2
+        description: "addressline2 (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: spatiallocation
+        description: "spatiallocation (character varying, nullable)"
+      - name: stateprovinceid
+        description: "stateprovinceid (bigint, nullable)"

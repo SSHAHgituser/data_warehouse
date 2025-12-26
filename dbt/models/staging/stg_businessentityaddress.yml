@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_businessentityaddress
+    description: "Staging model for businessentityaddress table from public schema"
+    columns:
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: addressid
+        description: "addressid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: addresstypeid
+        description: "addresstypeid (bigint, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

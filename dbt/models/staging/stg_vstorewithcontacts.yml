@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: stg_vstorewithcontacts
+    description: "Staging model for vstorewithcontacts table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: title
+        description: "title (character varying, nullable)"
+      - name: suffix
+        description: "suffix (character varying, nullable)"
+      - name: lastname
+        description: "lastname (character varying, nullable)"
+      - name: firstname
+        description: "firstname (character varying, nullable)"
+      - name: middlename
+        description: "middlename (character varying, nullable)"
+      - name: contacttype
+        description: "contacttype (character varying, nullable)"
+      - name: phonenumber
+        description: "phonenumber (character varying, nullable)"
+      - name: emailaddress
+        description: "emailaddress (character varying, nullable)"
+      - name: emailpromotion
+        description: "emailpromotion (bigint, nullable)"
+      - name: phonenumbertype
+        description: "phonenumbertype (character varying, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

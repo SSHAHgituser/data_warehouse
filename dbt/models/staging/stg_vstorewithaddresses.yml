@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stg_vstorewithaddresses
+    description: "Staging model for vstorewithaddresses table from public schema"
+    columns:
+      - name: city
+        description: "city (character varying, nullable)"
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: postalcode
+        description: "postalcode (character varying, nullable)"
+      - name: addresstype
+        description: "addresstype (character varying, nullable)"
+      - name: addressline1
+        description: "addressline1 (character varying, nullable)"
+      - name: addressline2
+        description: "addressline2 (character varying, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"
+      - name: countryregionname
+        description: "countryregionname (character varying, nullable)"
+      - name: stateprovincename
+        description: "stateprovincename (character varying, nullable)"

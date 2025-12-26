@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_vproductanddescription
+    description: "Staging model for vproductanddescription table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: cultureid
+        description: "cultureid (character varying, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: description
+        description: "description (character varying, nullable)"
+      - name: productmodel
+        description: "productmodel (character varying, nullable)"

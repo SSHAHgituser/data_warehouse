@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_scrapreason
+    description: "Staging model for scrapreason table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: scrapreasonid
+        description: "scrapreasonid (bigint, nullable)"

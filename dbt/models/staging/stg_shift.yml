@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_shift
+    description: "Staging model for shift table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: endtime
+        description: "endtime (time without time zone, nullable)"
+      - name: shiftid
+        description: "shiftid (bigint, nullable)"
+      - name: starttime
+        description: "starttime (time without time zone, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"

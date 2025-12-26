@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_shoppingcartitem
+    description: "Staging model for shoppingcartitem table from public schema"
+    columns:
+      - name: quantity
+        description: "quantity (bigint, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: datecreated
+        description: "datecreated (timestamp without time zone, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: shoppingcartid
+        description: "shoppingcartid (character varying, nullable)"
+      - name: shoppingcartitemid
+        description: "shoppingcartitemid (bigint, nullable)"

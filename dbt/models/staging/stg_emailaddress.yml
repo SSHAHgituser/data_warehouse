@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_emailaddress
+    description: "Staging model for emailaddress table from public schema"
+    columns:
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: emailaddress
+        description: "emailaddress (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: emailaddressid
+        description: "emailaddressid (bigint, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

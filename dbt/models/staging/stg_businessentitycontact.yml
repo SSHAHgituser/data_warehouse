@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_businessentitycontact
+    description: "Staging model for businessentitycontact table from public schema"
+    columns:
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: personid
+        description: "personid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: contacttypeid
+        description: "contacttypeid (bigint, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg_person
+    description: "Staging model for person table from public schema"
+    columns:
+      - name: title
+        description: "title (character varying, nullable)"
+      - name: suffix
+        description: "suffix (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: lastname
+        description: "lastname (character varying, nullable)"
+      - name: firstname
+        description: "firstname (character varying, nullable)"
+      - name: namestyle
+        description: "namestyle (character varying, nullable)"
+      - name: middlename
+        description: "middlename (character varying, nullable)"
+      - name: persontype
+        description: "persontype (character varying, nullable)"
+      - name: demographics
+        description: "demographics (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: emailpromotion
+        description: "emailpromotion (bigint, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"
+      - name: additionalcontactinfo
+        description: "additionalcontactinfo (character varying, nullable)"

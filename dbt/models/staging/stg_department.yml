@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_department
+    description: "Staging model for department table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: groupname
+        description: "groupname (character varying, nullable)"
+      - name: departmentid
+        description: "departmentid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"

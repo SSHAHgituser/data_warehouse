@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_specialofferproduct
+    description: "Staging model for specialofferproduct table from public schema"
+    columns:
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: specialofferid
+        description: "specialofferid (bigint, nullable)"

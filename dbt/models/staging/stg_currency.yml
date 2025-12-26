@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_currency
+    description: "Staging model for currency table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: currencycode
+        description: "currencycode (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"

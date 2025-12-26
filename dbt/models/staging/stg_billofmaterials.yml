@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stg_billofmaterials
+    description: "Staging model for billofmaterials table from public schema"
+    columns:
+      - name: enddate
+        description: "enddate (timestamp without time zone, nullable)"
+      - name: bomlevel
+        description: "bomlevel (bigint, nullable)"
+      - name: startdate
+        description: "startdate (timestamp without time zone, nullable)"
+      - name: componentid
+        description: "componentid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: perassemblyqty
+        description: "perassemblyqty (numeric, nullable)"
+      - name: unitmeasurecode
+        description: "unitmeasurecode (character varying, nullable)"
+      - name: billofmaterialsid
+        description: "billofmaterialsid (bigint, nullable)"
+      - name: productassemblyid
+        description: "productassemblyid (bigint, nullable)"

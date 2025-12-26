@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_productmodelproductdescriptionculture
+    description: "Staging model for productmodelproductdescriptionculture table from public schema"
+    columns:
+      - name: cultureid
+        description: "cultureid (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: productmodelid
+        description: "productmodelid (bigint, nullable)"
+      - name: productdescriptionid
+        description: "productdescriptionid (bigint, nullable)"

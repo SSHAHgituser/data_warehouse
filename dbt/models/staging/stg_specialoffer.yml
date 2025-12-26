@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_specialoffer
+    description: "Staging model for specialoffer table from public schema"
+    columns:
+      - name: type
+        description: "type (character varying, nullable)"
+      - name: maxqty
+        description: "maxqty (bigint, nullable)"
+      - name: minqty
+        description: "minqty (bigint, nullable)"
+      - name: enddate
+        description: "enddate (timestamp without time zone, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: category
+        description: "category (character varying, nullable)"
+      - name: startdate
+        description: "startdate (timestamp without time zone, nullable)"
+      - name: description
+        description: "description (character varying, nullable)"
+      - name: discountpct
+        description: "discountpct (numeric, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: specialofferid
+        description: "specialofferid (bigint, nullable)"

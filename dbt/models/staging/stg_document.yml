@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg_document
+    description: "Staging model for document table from public schema"
+    columns:
+      - name: owner
+        description: "owner (bigint, nullable)"
+      - name: title
+        description: "title (character varying, nullable)"
+      - name: status
+        description: "status (bigint, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: document
+        description: "document (character varying, nullable)"
+      - name: filename
+        description: "filename (character varying, nullable)"
+      - name: revision
+        description: "revision (character varying, nullable)"
+      - name: folderflag
+        description: "folderflag (character varying, nullable)"
+      - name: changenumber
+        description: "changenumber (bigint, nullable)"
+      - name: documentnode
+        description: "documentnode (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: fileextension
+        description: "fileextension (character varying, nullable)"
+      - name: documentsummary
+        description: "documentsummary (character varying, nullable)"

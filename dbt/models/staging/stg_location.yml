@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_location
+    description: "Staging model for location table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: costrate
+        description: "costrate (numeric, nullable)"
+      - name: locationid
+        description: "locationid (bigint, nullable)"
+      - name: availability
+        description: "availability (numeric, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"

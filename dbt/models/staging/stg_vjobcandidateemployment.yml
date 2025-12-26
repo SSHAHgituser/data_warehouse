@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_vjobcandidateemployment
+    description: "Staging model for vjobcandidateemployment table from public schema"
+    columns:
+      - name: Emp_EndDate
+        description: "Emp_EndDate (date, nullable)"
+      - name: Emp_OrgName
+        description: "Emp_OrgName (character varying, nullable)"
+      - name: Emp_JobTitle
+        description: "Emp_JobTitle (character varying, nullable)"
+      - name: Emp_Loc_City
+        description: "Emp_Loc_City (character varying, nullable)"
+      - name: Emp_Loc_State
+        description: "Emp_Loc_State (character varying, nullable)"
+      - name: Emp_StartDate
+        description: "Emp_StartDate (date, nullable)"
+      - name: jobcandidateid
+        description: "jobcandidateid (bigint, nullable)"
+      - name: Emp_Responsibility
+        description: "Emp_Responsibility (character varying, nullable)"
+      - name: Emp_FunctionCategory
+        description: "Emp_FunctionCategory (character varying, nullable)"
+      - name: Emp_IndustryCategory
+        description: "Emp_IndustryCategory (character varying, nullable)"
+      - name: Emp_Loc_CountryRegion
+        description: "Emp_Loc_CountryRegion (character varying, nullable)"

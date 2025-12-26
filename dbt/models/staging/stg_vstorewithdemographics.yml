@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: stg_vstorewithdemographics
+    description: "Staging model for vstorewithdemographics table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: Brands
+        description: "Brands (character varying, nullable)"
+      - name: BankName
+        description: "BankName (character varying, nullable)"
+      - name: Internet
+        description: "Internet (character varying, nullable)"
+      - name: Specialty
+        description: "Specialty (character varying, nullable)"
+      - name: SquareFeet
+        description: "SquareFeet (bigint, nullable)"
+      - name: YearOpened
+        description: "YearOpened (bigint, nullable)"
+      - name: AnnualSales
+        description: "AnnualSales (numeric, nullable)"
+      - name: BusinessType
+        description: "BusinessType (character varying, nullable)"
+      - name: AnnualRevenue
+        description: "AnnualRevenue (numeric, nullable)"
+      - name: NumberEmployees
+        description: "NumberEmployees (bigint, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

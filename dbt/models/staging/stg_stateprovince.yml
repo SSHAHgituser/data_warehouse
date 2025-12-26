@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: stg_stateprovince
+    description: "Staging model for stateprovince table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: territoryid
+        description: "territoryid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: stateprovinceid
+        description: "stateprovinceid (bigint, nullable)"
+      - name: countryregioncode
+        description: "countryregioncode (character varying, nullable)"
+      - name: stateprovincecode
+        description: "stateprovincecode (character varying, nullable)"
+      - name: isonlystateprovinceflag
+        description: "isonlystateprovinceflag (character varying, nullable)"

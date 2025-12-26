@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_unitmeasure
+    description: "Staging model for unitmeasure table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: unitmeasurecode
+        description: "unitmeasurecode (character varying, nullable)"

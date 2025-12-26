@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_productinventory
+    description: "Staging model for productinventory table from public schema"
+    columns:
+      - name: bin
+        description: "bin (bigint, nullable)"
+      - name: shelf
+        description: "shelf (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: quantity
+        description: "quantity (bigint, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: locationid
+        description: "locationid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"

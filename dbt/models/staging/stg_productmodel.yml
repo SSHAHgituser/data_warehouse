@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_productmodel
+    description: "Staging model for productmodel table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: instructions
+        description: "instructions (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: productmodelid
+        description: "productmodelid (bigint, nullable)"
+      - name: catalogdescription
+        description: "catalogdescription (character varying, nullable)"

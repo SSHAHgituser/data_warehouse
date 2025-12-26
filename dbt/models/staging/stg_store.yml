@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_store
+    description: "Staging model for store table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: demographics
+        description: "demographics (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: salespersonid
+        description: "salespersonid (bigint, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

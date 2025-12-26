@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_salesreason
+    description: "Staging model for salesreason table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: reasontype
+        description: "reasontype (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: salesreasonid
+        description: "salesreasonid (bigint, nullable)"

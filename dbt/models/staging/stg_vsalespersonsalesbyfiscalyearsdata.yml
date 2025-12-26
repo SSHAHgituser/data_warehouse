@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_vsalespersonsalesbyfiscalyearsdata
+    description: "Staging model for vsalespersonsalesbyfiscalyearsdata table from public schema"
+    columns:
+      - name: fullname
+        description: "fullname (character varying, nullable)"
+      - name: jobtitle
+        description: "jobtitle (character varying, nullable)"
+      - name: fiscalyear
+        description: "fiscalyear (numeric, nullable)"
+      - name: salestotal
+        description: "salestotal (numeric, nullable)"
+      - name: salespersonid
+        description: "salespersonid (bigint, nullable)"
+      - name: salesterritory
+        description: "salesterritory (character varying, nullable)"

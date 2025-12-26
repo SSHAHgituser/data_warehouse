@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_productmodelillustration
+    description: "Staging model for productmodelillustration table from public schema"
+    columns:
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: illustrationid
+        description: "illustrationid (bigint, nullable)"
+      - name: productmodelid
+        description: "productmodelid (bigint, nullable)"

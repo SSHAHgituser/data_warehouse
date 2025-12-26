@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: stg_salesorderheader
+    description: "Staging model for salesorderheader table from public schema"
+    columns:
+      - name: status
+        description: "status (bigint, nullable)"
+      - name: taxamt
+        description: "taxamt (numeric, nullable)"
+      - name: comment
+        description: "comment (character varying, nullable)"
+      - name: duedate
+        description: "duedate (timestamp without time zone, nullable)"
+      - name: freight
+        description: "freight (numeric, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: shipdate
+        description: "shipdate (timestamp without time zone, nullable)"
+      - name: subtotal
+        description: "subtotal (numeric, nullable)"
+      - name: totaldue
+        description: "totaldue (numeric, nullable)"
+      - name: orderdate
+        description: "orderdate (timestamp without time zone, nullable)"
+      - name: customerid
+        description: "customerid (bigint, nullable)"
+      - name: territoryid
+        description: "territoryid (bigint, nullable)"
+      - name: creditcardid
+        description: "creditcardid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: salesorderid
+        description: "salesorderid (bigint, nullable)"
+      - name: shipmethodid
+        description: "shipmethodid (bigint, nullable)"
+      - name: accountnumber
+        description: "accountnumber (character varying, nullable)"
+      - name: salespersonid
+        description: "salespersonid (bigint, nullable)"
+      - name: currencyrateid
+        description: "currencyrateid (bigint, nullable)"
+      - name: revisionnumber
+        description: "revisionnumber (bigint, nullable)"
+      - name: billtoaddressid
+        description: "billtoaddressid (bigint, nullable)"
+      - name: onlineorderflag
+        description: "onlineorderflag (character varying, nullable)"
+      - name: shiptoaddressid
+        description: "shiptoaddressid (bigint, nullable)"
+      - name: purchaseordernumber
+        description: "purchaseordernumber (character varying, nullable)"
+      - name: creditcardapprovalcode
+        description: "creditcardapprovalcode (character varying, nullable)"

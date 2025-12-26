@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_employeedepartmenthistory
+    description: "Staging model for employeedepartmenthistory table from public schema"
+    columns:
+      - name: enddate
+        description: "enddate (date, nullable)"
+      - name: shiftid
+        description: "shiftid (bigint, nullable)"
+      - name: startdate
+        description: "startdate (date, nullable)"
+      - name: departmentid
+        description: "departmentid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

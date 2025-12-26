@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: stg_employee
+    description: "Staging model for employee table from public schema"
+    columns:
+      - name: gender
+        description: "gender (character varying, nullable)"
+      - name: loginid
+        description: "loginid (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: hiredate
+        description: "hiredate (date, nullable)"
+      - name: jobtitle
+        description: "jobtitle (character varying, nullable)"
+      - name: birthdate
+        description: "birthdate (date, nullable)"
+      - name: currentflag
+        description: "currentflag (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: salariedflag
+        description: "salariedflag (character varying, nullable)"
+      - name: maritalstatus
+        description: "maritalstatus (character varying, nullable)"
+      - name: vacationhours
+        description: "vacationhours (bigint, nullable)"
+      - name: sickleavehours
+        description: "sickleavehours (bigint, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"
+      - name: nationalidnumber
+        description: "nationalidnumber (character varying, nullable)"
+      - name: organizationnode
+        description: "organizationnode (character varying, nullable)"

@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_countryregion
+    description: "Staging model for countryregion table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: countryregioncode
+        description: "countryregioncode (character varying, nullable)"

@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_personcreditcard
+    description: "Staging model for personcreditcard table from public schema"
+    columns:
+      - name: creditcardid
+        description: "creditcardid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_vstateprovincecountryregion
+    description: "Staging model for vstateprovincecountryregion table from public schema"
+    columns:
+      - name: territoryid
+        description: "territoryid (bigint, nullable)"
+      - name: stateprovinceid
+        description: "stateprovinceid (bigint, nullable)"
+      - name: countryregioncode
+        description: "countryregioncode (character varying, nullable)"
+      - name: countryregionname
+        description: "countryregionname (character varying, nullable)"
+      - name: stateprovincecode
+        description: "stateprovincecode (character varying, nullable)"
+      - name: stateprovincename
+        description: "stateprovincename (character varying, nullable)"
+      - name: isonlystateprovinceflag
+        description: "isonlystateprovinceflag (character varying, nullable)"

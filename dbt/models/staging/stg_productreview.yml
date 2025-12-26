@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: stg_productreview
+    description: "Staging model for productreview table from public schema"
+    columns:
+      - name: rating
+        description: "rating (bigint, nullable)"
+      - name: comments
+        description: "comments (character varying, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: reviewdate
+        description: "reviewdate (timestamp without time zone, nullable)"
+      - name: emailaddress
+        description: "emailaddress (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: reviewername
+        description: "reviewername (character varying, nullable)"
+      - name: productreviewid
+        description: "productreviewid (bigint, nullable)"

@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stg_salesperson
+    description: "Staging model for salesperson table from public schema"
+    columns:
+      - name: bonus
+        description: "bonus (numeric, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: salesytd
+        description: "salesytd (numeric, nullable)"
+      - name: salesquota
+        description: "salesquota (numeric, nullable)"
+      - name: territoryid
+        description: "territoryid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: commissionpct
+        description: "commissionpct (numeric, nullable)"
+      - name: saleslastyear
+        description: "saleslastyear (numeric, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_personphone
+    description: "Staging model for personphone table from public schema"
+    columns:
+      - name: phonenumber
+        description: "phonenumber (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"
+      - name: phonenumbertypeid
+        description: "phonenumbertypeid (bigint, nullable)"

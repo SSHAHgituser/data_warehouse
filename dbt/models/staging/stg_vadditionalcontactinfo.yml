@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: stg_vadditionalcontactinfo
+    description: "Staging model for vadditionalcontactinfo table from public schema"
+    columns:
+      - name: city
+        description: "city (character varying, nullable)"
+      - name: street
+        description: "street (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: lastname
+        description: "lastname (character varying, nullable)"
+      - name: firstname
+        description: "firstname (character varying, nullable)"
+      - name: middlename
+        description: "middlename (character varying, nullable)"
+      - name: postalcode
+        description: "postalcode (character varying, nullable)"
+      - name: emailaddress
+        description: "emailaddress (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: countryregion
+        description: "countryregion (character varying, nullable)"
+      - name: stateprovince
+        description: "stateprovince (character varying, nullable)"
+      - name: telephonenumber
+        description: "telephonenumber (character varying, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"
+      - name: emailtelephonenumber
+        description: "emailtelephonenumber (character varying, nullable)"
+      - name: emailspecialinstructions
+        description: "emailspecialinstructions (character varying, nullable)"
+      - name: telephonespecialinstructions
+        description: "telephonespecialinstructions (character varying, nullable)"
+      - name: homeaddressspecialinstructions
+        description: "homeaddressspecialinstructions (character varying, nullable)"

@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: stg_workorderrouting
+    description: "Staging model for workorderrouting table from public schema"
+    columns:
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: actualcost
+        description: "actualcost (numeric, nullable)"
+      - name: locationid
+        description: "locationid (bigint, nullable)"
+      - name: plannedcost
+        description: "plannedcost (numeric, nullable)"
+      - name: workorderid
+        description: "workorderid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: actualenddate
+        description: "actualenddate (timestamp without time zone, nullable)"
+      - name: actualstartdate
+        description: "actualstartdate (timestamp without time zone, nullable)"
+      - name: scheduledenddate
+        description: "scheduledenddate (timestamp without time zone, nullable)"
+      - name: actualresourcehrs
+        description: "actualresourcehrs (numeric, nullable)"
+      - name: operationsequence
+        description: "operationsequence (bigint, nullable)"
+      - name: scheduledstartdate
+        description: "scheduledstartdate (timestamp without time zone, nullable)"

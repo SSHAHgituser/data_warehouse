@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_addresstype
+    description: "Staging model for addresstype table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: addresstypeid
+        description: "addresstypeid (bigint, nullable)"

@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_countryregioncurrency
+    description: "Staging model for countryregioncurrency table from public schema"
+    columns:
+      - name: currencycode
+        description: "currencycode (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: countryregioncode
+        description: "countryregioncode (character varying, nullable)"

@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_vproductmodelinstructions
+    description: "Staging model for vproductmodelinstructions table from public schema"
+    columns:
+      - name: Step
+        description: "Step (character varying, nullable)"
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: LotSize
+        description: "LotSize (bigint, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: LaborHours
+        description: "LaborHours (numeric, nullable)"
+      - name: LocationID
+        description: "LocationID (bigint, nullable)"
+      - name: SetupHours
+        description: "SetupHours (numeric, nullable)"
+      - name: MachineHours
+        description: "MachineHours (numeric, nullable)"
+      - name: instructions
+        description: "instructions (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: productmodelid
+        description: "productmodelid (bigint, nullable)"

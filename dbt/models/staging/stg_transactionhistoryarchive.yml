@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stg_transactionhistoryarchive
+    description: "Staging model for transactionhistoryarchive table from public schema"
+    columns:
+      - name: quantity
+        description: "quantity (bigint, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: actualcost
+        description: "actualcost (numeric, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: transactionid
+        description: "transactionid (bigint, nullable)"
+      - name: transactiondate
+        description: "transactiondate (timestamp without time zone, nullable)"
+      - name: transactiontype
+        description: "transactiontype (character varying, nullable)"
+      - name: referenceorderid
+        description: "referenceorderid (bigint, nullable)"
+      - name: referenceorderlineid
+        description: "referenceorderlineid (bigint, nullable)"

@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: stg_vproductmodelcatalogdescription
+    description: "Staging model for vproductmodelcatalogdescription table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: color
+        description: "color (character varying, nullable)"
+      - name: pedal
+        description: "pedal (character varying, nullable)"
+      - name: style
+        description: "style (character varying, nullable)"
+      - name: wheel
+        description: "wheel (character varying, nullable)"
+      - name: saddle
+        description: "saddle (character varying, nullable)"
+      - name: Summary
+        description: "Summary (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: crankset
+        description: "crankset (character varying, nullable)"
+      - name: material
+        description: "material (character varying, nullable)"
+      - name: bikeframe
+        description: "bikeframe (character varying, nullable)"
+      - name: copyright
+        description: "copyright (character varying, nullable)"
+      - name: noofyears
+        description: "noofyears (character varying, nullable)"
+      - name: producturl
+        description: "producturl (character varying, nullable)"
+      - name: picturesize
+        description: "picturesize (character varying, nullable)"
+      - name: productline
+        description: "productline (character varying, nullable)"
+      - name: manufacturer
+        description: "manufacturer (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: pictureangle
+        description: "pictureangle (character varying, nullable)"
+      - name: productmodelid
+        description: "productmodelid (bigint, nullable)"
+      - name: productphotoid
+        description: "productphotoid (character varying, nullable)"
+      - name: warrantyperiod
+        description: "warrantyperiod (character varying, nullable)"
+      - name: riderexperience
+        description: "riderexperience (character varying, nullable)"
+      - name: warrantydescription
+        description: "warrantydescription (character varying, nullable)"
+      - name: maintenancedescription
+        description: "maintenancedescription (character varying, nullable)"

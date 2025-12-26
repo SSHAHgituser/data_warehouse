@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_businessentity
+    description: "Staging model for businessentity table from public schema"
+    columns:
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

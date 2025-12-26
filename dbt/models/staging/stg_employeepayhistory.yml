@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_employeepayhistory
+    description: "Staging model for employeepayhistory table from public schema"
+    columns:
+      - name: rate
+        description: "rate (numeric, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: payfrequency
+        description: "payfrequency (bigint, nullable)"
+      - name: ratechangedate
+        description: "ratechangedate (timestamp without time zone, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

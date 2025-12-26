@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg_vpersondemographics
+    description: "Staging model for vpersondemographics table from public schema"
+    columns:
+      - name: gender
+        description: "gender (character varying, nullable)"
+      - name: birthdate
+        description: "birthdate (date, nullable)"
+      - name: education
+        description: "education (character varying, nullable)"
+      - name: occupation
+        description: "occupation (character varying, nullable)"
+      - name: yearlyincome
+        description: "yearlyincome (character varying, nullable)"
+      - name: homeownerflag
+        description: "homeownerflag (boolean, nullable)"
+      - name: maritalstatus
+        description: "maritalstatus (character varying, nullable)"
+      - name: totalchildren
+        description: "totalchildren (bigint, nullable)"
+      - name: numbercarsowned
+        description: "numbercarsowned (bigint, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"
+      - name: totalpurchaseytd
+        description: "totalpurchaseytd (numeric, nullable)"
+      - name: datefirstpurchase
+        description: "datefirstpurchase (date, nullable)"
+      - name: numberchildrenathome
+        description: "numberchildrenathome (bigint, nullable)"

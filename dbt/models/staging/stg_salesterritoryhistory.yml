@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_salesterritoryhistory
+    description: "Staging model for salesterritoryhistory table from public schema"
+    columns:
+      - name: enddate
+        description: "enddate (timestamp without time zone, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: startdate
+        description: "startdate (timestamp without time zone, nullable)"
+      - name: territoryid
+        description: "territoryid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

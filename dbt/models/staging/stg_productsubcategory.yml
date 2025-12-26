@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_productsubcategory
+    description: "Staging model for productsubcategory table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: productcategoryid
+        description: "productcategoryid (bigint, nullable)"
+      - name: productsubcategoryid
+        description: "productsubcategoryid (bigint, nullable)"

@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stg_workorder
+    description: "Staging model for workorder table from public schema"
+    columns:
+      - name: duedate
+        description: "duedate (timestamp without time zone, nullable)"
+      - name: enddate
+        description: "enddate (timestamp without time zone, nullable)"
+      - name: orderqty
+        description: "orderqty (bigint, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: startdate
+        description: "startdate (timestamp without time zone, nullable)"
+      - name: scrappedqty
+        description: "scrappedqty (bigint, nullable)"
+      - name: workorderid
+        description: "workorderid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: scrapreasonid
+        description: "scrapreasonid (bigint, nullable)"

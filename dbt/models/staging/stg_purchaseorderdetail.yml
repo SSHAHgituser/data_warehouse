@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stg_purchaseorderdetail
+    description: "Staging model for purchaseorderdetail table from public schema"
+    columns:
+      - name: duedate
+        description: "duedate (timestamp without time zone, nullable)"
+      - name: orderqty
+        description: "orderqty (bigint, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: unitprice
+        description: "unitprice (numeric, nullable)"
+      - name: receivedqty
+        description: "receivedqty (numeric, nullable)"
+      - name: rejectedqty
+        description: "rejectedqty (numeric, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: purchaseorderid
+        description: "purchaseorderid (bigint, nullable)"
+      - name: purchaseorderdetailid
+        description: "purchaseorderdetailid (bigint, nullable)"

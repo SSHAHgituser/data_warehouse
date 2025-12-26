@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: stg_salesorderdetail
+    description: "Staging model for salesorderdetail table from public schema"
+    columns:
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: orderqty
+        description: "orderqty (bigint, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: unitprice
+        description: "unitprice (numeric, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: salesorderid
+        description: "salesorderid (bigint, nullable)"
+      - name: specialofferid
+        description: "specialofferid (bigint, nullable)"
+      - name: unitpricediscount
+        description: "unitpricediscount (numeric, nullable)"
+      - name: salesorderdetailid
+        description: "salesorderdetailid (bigint, nullable)"
+      - name: carriertrackingnumber
+        description: "carriertrackingnumber (character varying, nullable)"

@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: stg_vjobcandidate
+    description: "Staging model for vjobcandidate table from public schema"
+    columns:
+      - name: EMail
+        description: "EMail (character varying, nullable)"
+      - name: Skills
+        description: "Skills (character varying, nullable)"
+      - name: WebSite
+        description: "WebSite (character varying, nullable)"
+      - name: Addr_Type
+        description: "Addr_Type (character varying, nullable)"
+      - name: Name_Last
+        description: "Name_Last (character varying, nullable)"
+      - name: Name_First
+        description: "Name_First (character varying, nullable)"
+      - name: Name_Middle
+        description: "Name_Middle (character varying, nullable)"
+      - name: Name_Prefix
+        description: "Name_Prefix (character varying, nullable)"
+      - name: Name_Suffix
+        description: "Name_Suffix (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: Addr_Loc_City
+        description: "Addr_Loc_City (character varying, nullable)"
+      - name: Addr_Loc_State
+        description: "Addr_Loc_State (character varying, nullable)"
+      - name: jobcandidateid
+        description: "jobcandidateid (bigint, nullable)"
+      - name: Addr_PostalCode
+        description: "Addr_PostalCode (character varying, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"
+      - name: Addr_Loc_CountryRegion
+        description: "Addr_Loc_CountryRegion (character varying, nullable)"

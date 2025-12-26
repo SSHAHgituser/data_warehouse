@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_productdescription
+    description: "Staging model for productdescription table from public schema"
+    columns:
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: description
+        description: "description (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: productdescriptionid
+        description: "productdescriptionid (bigint, nullable)"

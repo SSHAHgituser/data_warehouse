@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_productproductphoto
+    description: "Staging model for productproductphoto table from public schema"
+    columns:
+      - name: primary
+        description: "primary (character varying, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: productphotoid
+        description: "productphotoid (bigint, nullable)"

@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg_vjobcandidateeducation
+    description: "Staging model for vjobcandidateeducation table from public schema"
+    columns:
+      - name: Edu_GPA
+        description: "Edu_GPA (character varying, nullable)"
+      - name: Edu_Level
+        description: "Edu_Level (character varying, nullable)"
+      - name: Edu_Major
+        description: "Edu_Major (character varying, nullable)"
+      - name: Edu_Minor
+        description: "Edu_Minor (character varying, nullable)"
+      - name: Edu_Degree
+        description: "Edu_Degree (character varying, nullable)"
+      - name: Edu_School
+        description: "Edu_School (character varying, nullable)"
+      - name: Edu_EndDate
+        description: "Edu_EndDate (date, nullable)"
+      - name: Edu_GPAScale
+        description: "Edu_GPAScale (character varying, nullable)"
+      - name: Edu_Loc_City
+        description: "Edu_Loc_City (character varying, nullable)"
+      - name: Edu_Loc_State
+        description: "Edu_Loc_State (character varying, nullable)"
+      - name: Edu_StartDate
+        description: "Edu_StartDate (date, nullable)"
+      - name: jobcandidateid
+        description: "jobcandidateid (bigint, nullable)"
+      - name: Edu_Loc_CountryRegion
+        description: "Edu_Loc_CountryRegion (character varying, nullable)"

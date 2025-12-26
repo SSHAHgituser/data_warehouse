@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_customer
+    description: "Staging model for customer table from public schema"
+    columns:
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: storeid
+        description: "storeid (bigint, nullable)"
+      - name: personid
+        description: "personid (bigint, nullable)"
+      - name: customerid
+        description: "customerid (bigint, nullable)"
+      - name: territoryid
+        description: "territoryid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"

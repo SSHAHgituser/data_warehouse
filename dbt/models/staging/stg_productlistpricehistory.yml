@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_productlistpricehistory
+    description: "Staging model for productlistpricehistory table from public schema"
+    columns:
+      - name: enddate
+        description: "enddate (timestamp without time zone, nullable)"
+      - name: listprice
+        description: "listprice (numeric, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: startdate
+        description: "startdate (timestamp without time zone, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"

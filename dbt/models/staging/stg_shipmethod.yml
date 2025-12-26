@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_shipmethod
+    description: "Staging model for shipmethod table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: shipbase
+        description: "shipbase (numeric, nullable)"
+      - name: shiprate
+        description: "shiprate (numeric, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: shipmethodid
+        description: "shipmethodid (bigint, nullable)"

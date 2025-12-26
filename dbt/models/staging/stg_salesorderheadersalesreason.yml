@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_salesorderheadersalesreason
+    description: "Staging model for salesorderheadersalesreason table from public schema"
+    columns:
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: salesorderid
+        description: "salesorderid (bigint, nullable)"
+      - name: salesreasonid
+        description: "salesreasonid (bigint, nullable)"

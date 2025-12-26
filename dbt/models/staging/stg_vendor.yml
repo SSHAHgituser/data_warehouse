@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: stg_vendor
+    description: "Staging model for vendor table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: activeflag
+        description: "activeflag (character varying, nullable)"
+      - name: creditrating
+        description: "creditrating (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: accountnumber
+        description: "accountnumber (character varying, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"
+      - name: preferredvendorstatus
+        description: "preferredvendorstatus (character varying, nullable)"
+      - name: purchasingwebserviceurl
+        description: "purchasingwebserviceurl (character varying, nullable)"

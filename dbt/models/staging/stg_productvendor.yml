@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_productvendor
+    description: "Staging model for productvendor table from public schema"
+    columns:
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: onorderqty
+        description: "onorderqty (bigint, nullable)"
+      - name: maxorderqty
+        description: "maxorderqty (bigint, nullable)"
+      - name: minorderqty
+        description: "minorderqty (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: standardprice
+        description: "standardprice (numeric, nullable)"
+      - name: averageleadtime
+        description: "averageleadtime (bigint, nullable)"
+      - name: lastreceiptcost
+        description: "lastreceiptcost (numeric, nullable)"
+      - name: lastreceiptdate
+        description: "lastreceiptdate (timestamp without time zone, nullable)"
+      - name: unitmeasurecode
+        description: "unitmeasurecode (character varying, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

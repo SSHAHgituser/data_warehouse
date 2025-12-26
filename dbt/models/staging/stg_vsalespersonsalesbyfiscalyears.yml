@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_vsalespersonsalesbyfiscalyears
+    description: "Staging model for vsalespersonsalesbyfiscalyears table from public schema"
+    columns:
+      - name: _2012
+        description: "_2012 (numeric, nullable)"
+      - name: _2013
+        description: "_2013 (numeric, nullable)"
+      - name: _2014
+        description: "_2014 (numeric, nullable)"
+      - name: FullName
+        description: "FullName (character varying, nullable)"
+      - name: JobTitle
+        description: "JobTitle (character varying, nullable)"
+      - name: SalesPersonID
+        description: "SalesPersonID (bigint, nullable)"
+      - name: SalesTerritory
+        description: "SalesTerritory (character varying, nullable)"

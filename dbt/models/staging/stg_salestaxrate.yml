@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_salestaxrate
+    description: "Staging model for salestaxrate table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: taxrate
+        description: "taxrate (numeric, nullable)"
+      - name: taxtype
+        description: "taxtype (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: salestaxrateid
+        description: "salestaxrateid (bigint, nullable)"
+      - name: stateprovinceid
+        description: "stateprovinceid (bigint, nullable)"

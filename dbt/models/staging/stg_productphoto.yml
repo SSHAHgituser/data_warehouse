@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_productphoto
+    description: "Staging model for productphoto table from public schema"
+    columns:
+      - name: largephoto
+        description: "largephoto (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: productphotoid
+        description: "productphotoid (bigint, nullable)"
+      - name: thumbnailphoto
+        description: "thumbnailphoto (character varying, nullable)"
+      - name: largephotofilename
+        description: "largephotofilename (character varying, nullable)"
+      - name: thumbnailphotofilename
+        description: "thumbnailphotofilename (character varying, nullable)"

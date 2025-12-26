@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_currencyrate
+    description: "Staging model for currencyrate table from public schema"
+    columns:
+      - name: averagerate
+        description: "averagerate (numeric, nullable)"
+      - name: endofdayrate
+        description: "endofdayrate (numeric, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: currencyrateid
+        description: "currencyrateid (bigint, nullable)"
+      - name: tocurrencycode
+        description: "tocurrencycode (character varying, nullable)"
+      - name: currencyratedate
+        description: "currencyratedate (timestamp without time zone, nullable)"
+      - name: fromcurrencycode
+        description: "fromcurrencycode (character varying, nullable)"

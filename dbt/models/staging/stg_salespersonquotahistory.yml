@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_salespersonquotahistory
+    description: "Staging model for salespersonquotahistory table from public schema"
+    columns:
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: quotadate
+        description: "quotadate (timestamp without time zone, nullable)"
+      - name: salesquota
+        description: "salesquota (numeric, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

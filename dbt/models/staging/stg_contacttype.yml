@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_contacttype
+    description: "Staging model for contacttype table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: contacttypeid
+        description: "contacttypeid (bigint, nullable)"

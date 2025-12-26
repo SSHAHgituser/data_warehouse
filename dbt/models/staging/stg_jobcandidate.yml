@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_jobcandidate
+    description: "Staging model for jobcandidate table from public schema"
+    columns:
+      - name: resume
+        description: "resume (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: jobcandidateid
+        description: "jobcandidateid (bigint, nullable)"
+      - name: businessentityid
+        description: "businessentityid (bigint, nullable)"

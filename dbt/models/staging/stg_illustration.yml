@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_illustration
+    description: "Staging model for illustration table from public schema"
+    columns:
+      - name: diagram
+        description: "diagram (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: illustrationid
+        description: "illustrationid (bigint, nullable)"

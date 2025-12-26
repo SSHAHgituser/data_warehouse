@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: stg_product
+    description: "Staging model for product table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: size
+        description: "size (character varying, nullable)"
+      - name: class
+        description: "class (character varying, nullable)"
+      - name: color
+        description: "color (character varying, nullable)"
+      - name: style
+        description: "style (character varying, nullable)"
+      - name: weight
+        description: "weight (numeric, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: makeflag
+        description: "makeflag (character varying, nullable)"
+      - name: listprice
+        description: "listprice (numeric, nullable)"
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: productline
+        description: "productline (character varying, nullable)"
+      - name: sellenddate
+        description: "sellenddate (timestamp without time zone, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: reorderpoint
+        description: "reorderpoint (bigint, nullable)"
+      - name: standardcost
+        description: "standardcost (numeric, nullable)"
+      - name: productnumber
+        description: "productnumber (character varying, nullable)"
+      - name: sellstartdate
+        description: "sellstartdate (timestamp without time zone, nullable)"
+      - name: productmodelid
+        description: "productmodelid (bigint, nullable)"
+      - name: discontinueddate
+        description: "discontinueddate (timestamp without time zone, nullable)"
+      - name: safetystocklevel
+        description: "safetystocklevel (bigint, nullable)"
+      - name: daystomanufacture
+        description: "daystomanufacture (bigint, nullable)"
+      - name: finishedgoodsflag
+        description: "finishedgoodsflag (character varying, nullable)"
+      - name: sizeunitmeasurecode
+        description: "sizeunitmeasurecode (character varying, nullable)"
+      - name: productsubcategoryid
+        description: "productsubcategoryid (bigint, nullable)"
+      - name: weightunitmeasurecode
+        description: "weightunitmeasurecode (character varying, nullable)"

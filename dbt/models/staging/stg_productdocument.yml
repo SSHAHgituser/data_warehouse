@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_productdocument
+    description: "Staging model for productdocument table from public schema"
+    columns:
+      - name: productid
+        description: "productid (bigint, nullable)"
+      - name: documentnode
+        description: "documentnode (character varying, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"

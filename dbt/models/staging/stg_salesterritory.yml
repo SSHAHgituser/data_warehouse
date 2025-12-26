@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: stg_salesterritory
+    description: "Staging model for salesterritory table from public schema"
+    columns:
+      - name: name
+        description: "name (character varying, nullable)"
+      - name: group
+        description: "group (character varying, nullable)"
+      - name: costytd
+        description: "costytd (numeric, nullable)"
+      - name: rowguid
+        description: "rowguid (character varying, nullable)"
+      - name: salesytd
+        description: "salesytd (numeric, nullable)"
+      - name: territoryid
+        description: "territoryid (bigint, nullable)"
+      - name: costlastyear
+        description: "costlastyear (numeric, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
+      - name: saleslastyear
+        description: "saleslastyear (numeric, nullable)"
+      - name: countryregioncode
+        description: "countryregioncode (character varying, nullable)"

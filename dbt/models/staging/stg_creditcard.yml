@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_creditcard
+    description: "Staging model for creditcard table from public schema"
+    columns:
+      - name: expyear
+        description: "expyear (bigint, nullable)"
+      - name: cardtype
+        description: "cardtype (character varying, nullable)"
+      - name: expmonth
+        description: "expmonth (bigint, nullable)"
+      - name: cardnumber
+        description: "cardnumber (character varying, nullable)"
+      - name: creditcardid
+        description: "creditcardid (bigint, nullable)"
+      - name: modifieddate
+        description: "modifieddate (timestamp without time zone, nullable)"
