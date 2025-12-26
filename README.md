@@ -25,6 +25,11 @@ All services are configured in `docker-compose.yml`. Start them with:
 ./start.sh
 ```
 
+This script will:
+- Start PostgreSQL, Streamlit, and dbt-docs
+- Automatically install AdventureWorks database if it doesn't exist
+- Automatically install and start Airbyte if not already installed (takes ~30 minutes on first run)
+
 **To stop all services:**
 ```bash
 ./stop.sh
@@ -72,7 +77,7 @@ docker-compose logs -f dbt-docs
 
 ## Step-by-Step Setup
 
-The `./start.sh` script automates all of this, but here's the manual process:
+The `./start.sh` script automates all of this (including Airbyte installation), but here's the manual process:
 
 ### 1. Start PostgreSQL
 
@@ -125,7 +130,16 @@ Airbyte is **not** included in `docker-compose.yml` because:
 - **Official method**: `abctl` is the only officially supported local deployment method
 - **Better experience**: `abctl` handles everything automatically (Kubernetes, Helm charts, image management)
 
-**To install Airbyte:**
+**Automatic Installation (Recommended):**
+
+The `./start.sh` script automatically installs and starts Airbyte if it's not already installed:
+- Installs `abctl` if needed
+- Installs Airbyte (takes ~30 minutes on first run)
+- Starts the Airbyte server
+
+**Manual Installation:**
+
+If you prefer to install Airbyte manually:
 
 ```bash
 cd airbyte

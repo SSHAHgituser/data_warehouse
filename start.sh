@@ -6,7 +6,7 @@
 # 2. Streamlit
 # 3. dbt Documentation Server
 # 4. AdventureWorks Database (if not exists)
-# 5. Airbyte (if abctl is installed)
+# 5. Airbyte (installs abctl and Airbyte if needed, then starts)
 
 set -e
 
@@ -74,26 +74,89 @@ else
 fi
 echo ""
 
-# Step 5: Start Airbyte (if abctl is available)
+# Step 5: Install and Start Airbyte
 echo -e "${YELLOW}Step 5: Checking Airbyte status...${NC}"
+
+# Ensure abctl is installed
+if ! command -v abctl &> /dev/null; then
+    echo -e "${YELLOW}   abctl not found. Installing abctl...${NC}"
+    curl -LsfS https://get.airbyte.com | bash -
+    
+    if ! command -v abctl &> /dev/null; then
+        echo -e "${YELLOW}⚠ abctl installation failed. Skipping Airbyte setup.${NC}"
+        echo -e "${YELLOW}   Install manually: curl -LsfS https://get.airbyte.com | bash -${NC}"
+        echo ""
+    else
+        echo -e "${GREEN}✓ abctl installed${NC}"
+    fi
+fi
+
+# Check Airbyte status and install/start if needed
 if command -v abctl &> /dev/null; then
-    # Check if Airbyte is installed and running
-    AIRBYTE_STATUS=$(abctl local status 2>&1 || echo "not_installed")
-    if echo "$AIRBYTE_STATUS" | grep -qi "running\|installed"; then
-        # Try to start Airbyte (idempotent - won't error if already running)
-        if abctl local start &> /dev/null; then
-            echo -e "${GREEN}✓ Airbyte is running${NC}"
+    # Check if Airbyte is installed
+    AIRBYTE_STATUS_OUTPUT=$(abctl local status 2>&1)
+    
+    # Check for various status indicators
+    if echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "not.*installed\|does not appear to be installed"; then
+        echo -e "${YELLOW}   Airbyte is not installed. Installing now...${NC}"
+        echo -e "${YELLOW}   ⚠️  This will take approximately 30 minutes. Please be patient.${NC}"
+        echo ""
+        
+        # Temporarily disable exit on error for installation (it's a long process and optional)
+        set +e
+        abctl local install
+        INSTALL_RESULT=$?
+        set -e
+        
+        if [ $INSTALL_RESULT -eq 0 ]; then
+            echo -e "${GREEN}✓ Airbyte installed successfully${NC}"
+            echo -e "${YELLOW}   Starting Airbyte...${NC}"
+            # Give it a moment after installation
+            sleep 5
+            if abctl local start &> /dev/null 2>&1; then
+                echo -e "${GREEN}✓ Airbyte started${NC}"
+            else
+                echo -e "${YELLOW}⚠ Airbyte installed. Starting may take a moment. Check with: abctl local status${NC}"
+            fi
         else
-            echo -e "${GREEN}✓ Airbyte is already running${NC}"
+            echo -e "${YELLOW}⚠ Airbyte installation encountered issues.${NC}"
+            echo -e "${YELLOW}   You can retry manually: cd airbyte && ./setup_with_abctl.sh${NC}"
+        fi
+    elif echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "running"; then
+        # Airbyte is already running
+        echo -e "${GREEN}✓ Airbyte is already running${NC}"
+    elif echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "installed"; then
+        # Airbyte is installed but not running, start it
+        echo -e "${YELLOW}   Starting Airbyte...${NC}"
+        if abctl local start &> /dev/null 2>&1; then
+            echo -e "${GREEN}✓ Airbyte started${NC}"
+        else
+            echo -e "${YELLOW}⚠ Airbyte start command completed. Check status with: abctl local status${NC}"
         fi
     else
-        echo -e "${YELLOW}   Airbyte is not installed. Skipping startup.${NC}"
-        echo -e "${YELLOW}   To install Airbyte, run: cd airbyte && ./setup_with_abctl.sh${NC}"
-        echo -e "${YELLOW}   (Installation takes ~30 minutes)${NC}"
+        # Unknown status, try to start anyway (might be installed but status unclear)
+        echo -e "${YELLOW}   Attempting to start Airbyte...${NC}"
+        set +e
+        abctl local start &> /dev/null 2>&1
+        START_RESULT=$?
+        set -e
+        
+        if [ $START_RESULT -eq 0 ]; then
+            echo -e "${GREEN}✓ Airbyte started${NC}"
+        else
+            # If start failed, try installing
+            echo -e "${YELLOW}   Start failed. Attempting installation...${NC}"
+            echo -e "${YELLOW}   ⚠️  This will take approximately 30 minutes.${NC}"
+            set +e
+            abctl local install
+            INSTALL_RESULT=$?
+            set -e
+            if [ $INSTALL_RESULT -eq 0 ]; then
+                sleep 5
+                abctl local start &> /dev/null 2>&1 && echo -e "${GREEN}✓ Airbyte installed and started${NC}" || echo -e "${YELLOW}⚠ Installed. Check status: abctl local status${NC}"
+            fi
+        fi
     fi
-else
-    echo -e "${YELLOW}⚠ abctl not found. Airbyte setup skipped.${NC}"
-    echo -e "${YELLOW}   To install Airbyte, run: cd airbyte && ./setup_with_abctl.sh${NC}"
 fi
 echo ""
 
