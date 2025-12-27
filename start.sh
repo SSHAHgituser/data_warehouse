@@ -100,6 +100,7 @@ if command -v abctl &> /dev/null; then
     set -e
     
     # Check for various status indicators
+    # Note: abctl doesn't have a 'start' command, so we use docker start directly
     if echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "not.*installed\|does not appear to be installed"; then
         echo -e "${YELLOW}   Airbyte is not installed. Installing now...${NC}"
         echo -e "${YELLOW}   ⚠️  This will take approximately 30 minutes. Please be patient.${NC}"
@@ -113,62 +114,70 @@ if command -v abctl &> /dev/null; then
         
         if [ $INSTALL_RESULT -eq 0 ]; then
             echo -e "${GREEN}✓ Airbyte installed successfully${NC}"
-            echo -e "${YELLOW}   Starting Airbyte...${NC}"
+            echo -e "${YELLOW}   Starting Airbyte container...${NC}"
             # Give it a moment after installation
             sleep 5
+            # Start the kind cluster container directly
             set +e
-            abctl local start &> /dev/null 2>&1
+            docker start airbyte-abctl-control-plane &> /dev/null 2>&1
             START_RESULT=$?
             set -e
             if [ $START_RESULT -eq 0 ]; then
                 echo -e "${GREEN}✓ Airbyte started${NC}"
             else
-                echo -e "${YELLOW}⚠ Airbyte installed. Starting may take a moment. Check with: abctl local status${NC}"
+                echo -e "${YELLOW}⚠ Airbyte installed. Container may take a moment to start. Check with: abctl local status${NC}"
             fi
         else
             echo -e "${YELLOW}⚠ Airbyte installation encountered issues.${NC}"
             echo -e "${YELLOW}   You can retry manually: cd airbyte && ./setup_with_abctl.sh${NC}"
         fi
-    elif echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "running\|SUCCESS.*running"; then
-        # Airbyte is already running
-        echo -e "${GREEN}✓ Airbyte is already running${NC}"
-    elif echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "exited\|not running"; then
-        # Airbyte cluster container is stopped, start it
-        echo -e "${YELLOW}   Airbyte cluster is stopped. Starting...${NC}"
+    elif echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "ERROR.*not running\|container.*is not running\|status.*exited"; then
+        # Container exists but is not running - start it
+        echo -e "${YELLOW}   Airbyte container is stopped. Starting...${NC}"
         set +e
-        abctl local start
+        docker start airbyte-abctl-control-plane
         START_RESULT=$?
         set -e
         if [ $START_RESULT -eq 0 ]; then
             echo -e "${GREEN}✓ Airbyte started${NC}"
         else
-            echo -e "${YELLOW}⚠ Airbyte start encountered issues. Check with: abctl local status${NC}"
-            echo -e "${YELLOW}   You may need to restart Docker or reset the cluster.${NC}"
+            echo -e "${YELLOW}⚠ Failed to start Airbyte container. Check with: docker ps -a | grep airbyte${NC}"
         fi
-    elif echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "installed\|cluster.*found"; then
-        # Airbyte is installed but not running, start it
-        echo -e "${YELLOW}   Starting Airbyte...${NC}"
-        set +e
-        abctl local start
-        START_RESULT=$?
-        set -e
-        if [ $START_RESULT -eq 0 ]; then
-            echo -e "${GREEN}✓ Airbyte started${NC}"
+    elif echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "deployed\|SUCCESS.*Found.*cluster"; then
+        # Check if container is actually running
+        if docker ps --format "{{.Names}}" | grep -q "airbyte-abctl-control-plane"; then
+            echo -e "${GREEN}✓ Airbyte is already running${NC}"
         else
-            echo -e "${YELLOW}⚠ Airbyte start command completed. Check status with: abctl local status${NC}"
+            # Cluster exists but container not running
+            echo -e "${YELLOW}   Airbyte cluster found but container not running. Starting...${NC}"
+            set +e
+            docker start airbyte-abctl-control-plane
+            START_RESULT=$?
+            set -e
+            if [ $START_RESULT -eq 0 ]; then
+                echo -e "${GREEN}✓ Airbyte started${NC}"
+            else
+                echo -e "${YELLOW}⚠ Failed to start Airbyte container${NC}"
+            fi
         fi
     else
-        # Unknown status, try to start anyway (might be installed but status unclear)
-        echo -e "${YELLOW}   Airbyte status unclear. Attempting to start...${NC}"
-        set +e
-        abctl local start
-        START_RESULT=$?
-        set -e
-        
-        if [ $START_RESULT -eq 0 ]; then
-            echo -e "${GREEN}✓ Airbyte started${NC}"
+        # Unknown status - check container directly
+        if docker ps --format "{{.Names}}" | grep -q "airbyte-abctl-control-plane"; then
+            echo -e "${GREEN}✓ Airbyte is running${NC}"
+        elif docker ps -a --format "{{.Names}}" | grep -q "airbyte-abctl-control-plane"; then
+            # Container exists but stopped
+            echo -e "${YELLOW}   Airbyte container found but stopped. Starting...${NC}"
+            set +e
+            docker start airbyte-abctl-control-plane
+            START_RESULT=$?
+            set -e
+            if [ $START_RESULT -eq 0 ]; then
+                echo -e "${GREEN}✓ Airbyte started${NC}"
+            else
+                echo -e "${YELLOW}⚠ Could not start Airbyte. Check manually: docker ps -a | grep airbyte${NC}"
+            fi
         else
-            # If start failed, check if we need to install
+            # Container doesn't exist - might need installation
             if [ $AIRBYTE_STATUS_EXIT -ne 0 ] && echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "not.*installed\|does not appear"; then
                 echo -e "${YELLOW}   Airbyte not installed. Attempting installation...${NC}"
                 echo -e "${YELLOW}   ⚠️  This will take approximately 30 minutes.${NC}"
@@ -179,13 +188,13 @@ if command -v abctl &> /dev/null; then
                 if [ $INSTALL_RESULT -eq 0 ]; then
                     sleep 5
                     set +e
-                    abctl local start &> /dev/null 2>&1
+                    docker start airbyte-abctl-control-plane &> /dev/null 2>&1
                     FINAL_START_RESULT=$?
                     set -e
                     if [ $FINAL_START_RESULT -eq 0 ]; then
                         echo -e "${GREEN}✓ Airbyte installed and started${NC}"
                     else
-                        echo -e "${YELLOW}⚠ Installed. Check status: abctl local status${NC}"
+                        echo -e "${YELLOW}⚠ Installed. Container may take a moment to start. Check status: abctl local status${NC}"
                     fi
                 else
                     echo -e "${YELLOW}⚠ Installation failed. See troubleshooting: airbyte/troubleshooting.md${NC}"
