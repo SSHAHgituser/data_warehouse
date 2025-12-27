@@ -10,14 +10,23 @@ For manual startup, see the [main README](../README.md#step-by-step-setup).
 
 ## Local Development
 
-### Setup Virtual Environment
+### Quick Start
+
+The easiest way to run the app locally is using the convenience script:
 
 ```bash
 cd streamlit
-./setup_venv.sh
+./run.sh
 ```
 
-Or manually:
+This script will:
+- Create a virtual environment if it doesn't exist
+- Install/update all dependencies
+- Start the Streamlit app
+
+### Manual Setup (Optional)
+
+If you prefer to set up manually:
 
 ```bash
 cd streamlit
@@ -25,23 +34,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
-```
-
-### Run Locally
-
-**IMPORTANT: Always activate the virtual environment before running Streamlit**
-
-```bash
-cd streamlit
-source venv/bin/activate
 streamlit run app.py
-```
-
-Or use the convenience script:
-
-```bash
-cd streamlit
-./run.sh
 ```
 
 ## Troubleshooting

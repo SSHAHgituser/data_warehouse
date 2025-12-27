@@ -1,22 +1,40 @@
 #!/bin/bash
-# Script to run Streamlit app with proper virtual environment
+# Script to set up and run Streamlit app with proper virtual environment
+
+set -e
 
 cd "$(dirname "$0")"
 
-# Activate virtual environment
-if [ -d "venv" ]; then
-    source venv/bin/activate
-else
-    echo "Virtual environment not found. Creating one..."
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install --upgrade pip
-    pip install -r requirements.txt
+# Check if Python 3 is available
+if ! command -v python3 &> /dev/null; then
+    echo "❌ Error: Python 3 is not installed. Please install Python 3 first."
+    exit 1
 fi
 
-# Ensure all dependencies are installed
-echo "Checking dependencies..."
-pip install -q -r requirements.txt
+# Create virtual environment if it doesn't exist
+if [ ! -d "venv" ]; then
+    echo "🐍 Creating virtual environment..."
+    python3 -m venv venv
+    echo "✅ Virtual environment created"
+else
+    echo "✓ Virtual environment already exists"
+fi
+
+# Activate virtual environment
+echo "Activating virtual environment..."
+source venv/bin/activate
+
+# Upgrade pip
+echo "Upgrading pip..."
+pip install --quiet --upgrade pip
+
+# Install/update dependencies
+echo "Installing dependencies..."
+pip install --quiet -r requirements.txt
+
+echo ""
+echo "✅ Setup complete! Starting Streamlit..."
+echo ""
 
 # Run Streamlit
 streamlit run app.py
