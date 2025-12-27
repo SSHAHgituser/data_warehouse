@@ -40,8 +40,16 @@ docker-compose up -d streamlit
 echo -e "${GREEN}✓ Streamlit started${NC}"
 echo ""
 
-# Step 3: Start dbt Documentation Server
-echo -e "${YELLOW}Step 3: Starting dbt Documentation Server...${NC}"
+# Step 3: Build and Start dbt Documentation Server
+echo -e "${YELLOW}Step 3: Building and starting dbt Documentation Server...${NC}"
+
+# Build the dbt-docs image to ensure it has the latest dbt project files
+echo -e "${YELLOW}   Building dbt-docs Docker image...${NC}"
+docker-compose build dbt-docs
+echo -e "${GREEN}✓ dbt-docs image built${NC}"
+
+# Start the container (it will regenerate docs on startup)
+echo -e "${YELLOW}   Starting dbt-docs container (docs will be regenerated)...${NC}"
 docker-compose up -d dbt-docs
 echo -e "${GREEN}✓ dbt Documentation Server started${NC}"
 echo ""

@@ -8,6 +8,86 @@ The dbt documentation server is automatically started with `./start.sh` from the
 
 For manual startup, see the [main README](../README.md#step-by-step-setup).
 
+## dbt Documentation
+
+### Which Docs Are Being Served?
+
+The dbt-docs container serves documentation for **all models in your dbt project**:
+
+- **Staging models** (`models/staging/`) - Raw data transformations
+- **Intermediate models** (`models/intermediate/`) - Dimensions and facts
+  - Dimensions: `dim_customer`, `dim_date`, `dim_employee`, `dim_product`, `dim_territory`, `dim_vendor`
+  - Facts: `fact_employee_quota`, `fact_inventory`, `fact_purchase_order`, `fact_sales_order`, `fact_sales_order_line`, `fact_work_order`
+- **Mart models** (`models/marts/`) - Analytics-ready tables
+  - `mart_customer_analytics`
+  - `mart_employee_territory_performance`
+  - `mart_operations`
+  - `mart_product_analytics`
+  - `mart_sales`
+
+The docs are **automatically regenerated** each time the dbt-docs container starts, based on the current state of your dbt project files.
+
+### How to Update the Docs
+
+**Option 1: Restart the Container (Recommended)**
+```bash
+# From repository root
+docker-compose restart dbt-docs
+
+# Or use the stop/start scripts
+./stop.sh
+./start.sh
+```
+
+This will regenerate docs from the current dbt project files.
+
+**Option 2: Rebuild the Container (If dbt Project Files Changed)**
+```bash
+# From repository root
+docker-compose build dbt-docs
+docker-compose up -d dbt-docs
+```
+
+Use this if you've added new models, changed model structure, or updated schema files.
+
+**Option 3: Generate Docs Locally**
+```bash
+cd dbt
+./generate_docs.sh
+```
+
+This generates docs in `dbt/target/` directory. To view locally:
+```bash
+cd dbt
+./run_dbt.sh docs serve
+```
+
+**Option 4: Force Regeneration in Running Container**
+```bash
+# Regenerate docs inside the container
+docker exec data_warehouse_dbt_docs dbt docs generate
+
+# Restart nginx to serve new docs
+docker exec data_warehouse_dbt_docs nginx -s reload
+```
+
+### When Do Docs Update?
+
+- **On container start**: Docs are automatically regenerated when the container starts
+- **After model changes**: Rebuild or restart the container to see changes
+- **After schema updates**: Update `.yml` files and restart the container
+- **After running dbt**: If you run `dbt run` or `dbt build`, restart the container to refresh docs
+
+### Viewing the Docs
+
+Access the documentation at: **http://localhost:8080**
+
+The docs include:
+- **Lineage graph**: Visual representation of model dependencies
+- **Model documentation**: Descriptions, columns, tests, and relationships
+- **Source documentation**: Raw table schemas and descriptions
+- **Test results**: Data quality test outcomes
+
 ## Local Development
 
 ### Setup Virtual Environment
@@ -48,84 +128,90 @@ Before running dbt, create the schema in PostgreSQL:
 Or manually:
 
 ```bash
-docker exec -i data_warehouse_postgres psql -U postgres -d data_warehouse -c "CREATE SCHEMA IF NOT EXISTS dbt;"
+docker exec -i data_warehouse_postgres psql -U postgres -d data_warehouse <<EOF
+CREATE SCHEMA IF NOT EXISTS dbt;
+GRANT ALL PRIVILEGES ON SCHEMA dbt TO postgres;
+EOF
 ```
 
-## Usage
+### Run dbt Commands
 
-Always activate the virtual environment or use the convenience script:
+Use the convenience script:
 
 ```bash
 cd dbt
-./run_dbt.sh <command>
+./run_dbt.sh [command]
 ```
 
-### Common Commands
+Or manually:
 
 ```bash
-# Test connection
-./run_dbt.sh debug
-
-# Run all models
-./run_dbt.sh run
-
-# Run specific model
-./run_dbt.sh run --select model_name
-
-# Run tests
-./run_dbt.sh test
-
-# Generate documentation
-./run_dbt.sh docs generate
-
-# Serve documentation locally
-./run_dbt.sh docs serve
+cd dbt
+source venv/bin/activate
+export DBT_PROFILES_DIR=.
+dbt [command]
 ```
 
-## Docker Documentation Server
+Common commands:
+- `dbt run` - Run all models
+- `dbt test` - Run all tests
+- `dbt build` - Run models and tests
+- `dbt docs generate` - Generate documentation
+- `dbt docs serve` - Serve docs locally (port 8080)
 
-The dbt documentation is served via Docker container (see `docker-compose.yml`). The container automatically generates docs on startup and serves them via nginx.
-
-For Docker commands, see the [main README](../README.md#stopping-services).
-
-## Project Structure
+### Project Structure
 
 ```
 dbt/
-├── profiles.yml          # Database connection configuration
-├── dbt_project.yml       # dbt project configuration
-├── requirements.txt      # Python dependencies
-├── models/               # SQL model files
-│   └── example/          # Example models
-├── seeds/                # CSV seed files
-├── tests/                # Custom tests
+├── models/
+│   ├── staging/          # Raw data transformations
+│   ├── intermediate/     # Dimensions and facts
+│   └── marts/            # Analytics-ready tables
 ├── macros/               # Reusable SQL macros
-└── analyses/             # Ad-hoc analysis queries
+├── seeds/                # Seed data files
+├── tests/                # Custom tests
+├── analyses/             # Ad-hoc analyses
+├── dbt_project.yml       # Project configuration
+├── profiles.yml          # Database connection config
+└── README.md            # This file
 ```
 
-## Connection Details
+## Troubleshooting
 
-- **Host**: localhost (from host) or postgres (from Docker network)
-- **Port**: 5432
-- **Database**: data_warehouse
-- **Schema**: dbt
-- **User**: postgres
-- **Password**: postgres (update in profiles.yml or use environment variable)
+### Docs Not Updating
 
-## Environment Variables
+1. **Check if container is running**:
+   ```bash
+   docker-compose ps dbt-docs
+   ```
 
-For better security, use environment variables:
+2. **Check container logs**:
+   ```bash
+   docker-compose logs dbt-docs
+   ```
 
-```bash
-export DBT_PASSWORD=postgres
-export DBT_USER=postgres
-```
+3. **Verify dbt project files are in container**:
+   ```bash
+   docker exec data_warehouse_dbt_docs ls -la /app/models/
+   ```
 
-Then update `profiles.yml` to use `${DBT_PASSWORD}` and `${DBT_USER}`.
+4. **Regenerate docs manually**:
+   ```bash
+   docker exec data_warehouse_dbt_docs dbt docs generate
+   ```
 
-## Resources
+### Database Connection Issues
 
-- [dbt Documentation](https://docs.getdbt.com/)
-- [dbt Postgres Adapter](https://docs.getdbt.com/reference/warehouse-profiles/postgres-profile)
+1. **Verify PostgreSQL is running**:
+   ```bash
+   docker-compose ps postgres
+   ```
+
+2. **Test connection**:
+   ```bash
+   docker exec data_warehouse_dbt_docs dbt debug
+   ```
+
+3. **Check environment variables in docker-compose.yml**
 
 For more information about the overall project setup, see the [main README](../README.md).
