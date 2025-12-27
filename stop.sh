@@ -18,21 +18,58 @@ echo -e "${BLUE}🛑 Stopping Data Warehouse Stack...${NC}"
 echo ""
 
 # Step 1: Stop Airbyte (if running)
-echo -e "${YELLOW}Step 1: Checking Airbyte status...${NC}"
-if command -v abctl &> /dev/null; then
-    AIRBYTE_STATUS=$(abctl local status 2>&1 || echo "not_installed")
-    if echo "$AIRBYTE_STATUS" | grep -qi "running\|installed"; then
-        echo -e "${YELLOW}   Stopping Airbyte...${NC}"
-        if abctl local stop &> /dev/null; then
-            echo -e "${GREEN}✓ Airbyte stopped${NC}"
+echo -e "${YELLOW}Step 1: Stopping Airbyte...${NC}"
+
+# Check for Airbyte kind cluster container and stop it
+AIRBYTE_CONTAINER_RUNNING=$(docker ps --format "{{.Names}}" | grep -c "airbyte-abctl-control-plane" || echo "0")
+if [ "$AIRBYTE_CONTAINER_RUNNING" -gt 0 ]; then
+    echo -e "${YELLOW}   Found Airbyte kind cluster container. Stopping...${NC}"
+    set +e
+    docker stop airbyte-abctl-control-plane &> /dev/null
+    STOP_RESULT=$?
+    set -e
+    
+    if [ $STOP_RESULT -eq 0 ]; then
+        echo -e "${GREEN}✓ Airbyte container stopped${NC}"
+    else
+        echo -e "${YELLOW}⚠ Failed to stop Airbyte container (may require sudo or already stopping)${NC}"
+    fi
+    
+    # Wait a moment for the container to fully stop
+    sleep 2
+    
+    # Verify it's stopped
+    if docker ps --format "{{.Names}}" | grep -q "airbyte-abctl-control-plane"; then
+        echo -e "${YELLOW}⚠ Airbyte container still running. Attempting force stop...${NC}"
+        docker kill airbyte-abctl-control-plane &> /dev/null || true
+        sleep 1
+        if ! docker ps --format "{{.Names}}" | grep -q "airbyte-abctl-control-plane"; then
+            echo -e "${GREEN}✓ Airbyte container force stopped${NC}"
         else
-            echo -e "${YELLOW}⚠ Airbyte stop command failed (may already be stopped)${NC}"
+            echo -e "${RED}⚠ Could not stop Airbyte container. You may need to stop it manually:${NC}"
+            echo -e "${YELLOW}   docker stop airbyte-abctl-control-plane${NC}"
+        fi
+    fi
+elif command -v abctl &> /dev/null; then
+    # Check status via abctl if container not found but abctl is available
+    set +e
+    AIRBYTE_STATUS_OUTPUT=$(abctl local status 2>&1)
+    AIRBYTE_STATUS_EXIT=$?
+    set -e
+    
+    if [ $AIRBYTE_STATUS_EXIT -eq 0 ]; then
+        if echo "$AIRBYTE_STATUS_OUTPUT" | grep -qi "running\|SUCCESS.*running\|deployed"; then
+            echo -e "${YELLOW}   Airbyte appears to be running but container not found.${NC}"
+            echo -e "${YELLOW}   Note: abctl does not have a 'stop' command.${NC}"
+            echo -e "${YELLOW}   To stop Airbyte, you may need to uninstall: abctl local uninstall${NC}"
+        else
+            echo -e "${GREEN}✓ Airbyte is not running${NC}"
         fi
     else
-        echo -e "${GREEN}✓ Airbyte is not running${NC}"
+        echo -e "${GREEN}✓ Airbyte status check failed, but no containers found${NC}"
     fi
 else
-    echo -e "${GREEN}✓ abctl not found, skipping Airbyte${NC}"
+    echo -e "${GREEN}✓ No Airbyte containers found and abctl not available${NC}"
 fi
 echo ""
 
