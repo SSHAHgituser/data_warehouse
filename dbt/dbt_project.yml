@@ -37,4 +37,9 @@ models:
       facts:
         +materialized: table
         +tags: ["fact"]
+    
+    # Mart models - consolidated analytics tables
+    marts:
+      +materialized: table
+      +tags: ["mart"]
 

@@ -1,0 +1,101 @@
+version: 2
+
+models:
+  - name: mart_sales
+    description: "Consolidated sales mart with all dimensions - supports sales performance, customer analytics, product sales, territory analysis, employee performance, time series, and market basket analysis"
+    columns:
+      - name: salesorderid
+        description: "Sales order ID"
+      - name: salesorderdetailid
+        description: "Sales order detail ID"
+      - name: customer_segment
+        description: "Customer value segment"
+      - name: customer_status
+        description: "Customer activity status"
+      - name: product_status
+        description: "Product status"
+      - name: order_total
+        description: "Total order amount"
+      - name: net_line_amount
+        description: "Net line item amount after discounts"
+      - name: total_profit
+        description: "Profit for line item"
+      - name: shipping_speed_category
+        description: "Shipping speed (Fast/Normal/Slow)"
+
+  - name: mart_customer_analytics
+    description: "Customer analytics mart with CLV, segmentation, RFM analysis, churn prediction, and cohort analysis"
+    columns:
+      - name: customerid
+        description: "Customer identifier"
+      - name: customer_segment
+        description: "Customer value segment"
+      - name: customer_status
+        description: "Customer activity status"
+      - name: lifetime_value
+        description: "Customer lifetime value"
+      - name: rfm_segment
+        description: "RFM score combination"
+      - name: rfm_category
+        description: "RFM category (Champions/Loyal/New/At Risk/Lost)"
+      - name: churn_risk
+        description: "Churn risk level (High/Medium/Low)"
+      - name: cohort_period
+        description: "Customer cohort period"
+
+  - name: mart_product_analytics
+    description: "Product analytics mart with profitability, sales trends, inventory optimization, and market basket analysis"
+    columns:
+      - name: productid
+        description: "Product identifier"
+      - name: category_name
+        description: "Product category"
+      - name: total_revenue
+        description: "Total product revenue"
+      - name: profit_margin_percent
+        description: "Profit margin percentage"
+      - name: inventory_status
+        description: "Current inventory status"
+      - name: top_related_product_id
+        description: "Most frequently co-purchased product"
+      - name: monthly_sales_velocity
+        description: "Average monthly sales velocity"
+      - name: inventory_turnover_ratio
+        description: "Inventory turnover ratio"
+      - name: product_lifecycle_stage
+        description: "Product lifecycle stage"
+
+  - name: mart_operations
+    description: "Operations mart combining purchase orders and work orders - supports vendor performance, production efficiency, and supply chain optimization"
+    columns:
+      - name: operation_type
+        description: "Type of operation (purchase_order/work_order)"
+      - name: operation_id
+        description: "Operation identifier"
+      - name: vendor_name
+        description: "Vendor name"
+      - name: rejection_rate_percent
+        description: "Rejection rate percentage"
+      - name: fulfillment_rate_percent
+        description: "Fulfillment rate percentage"
+      - name: cost_variance
+        description: "Cost variance (actual vs planned)"
+      - name: scrap_rate_percent
+        description: "Scrap rate percentage"
+
+  - name: mart_employee_territory_performance
+    description: "Employee and territory performance mart - supports employee performance tracking, territory analysis, and quota achievement"
+    columns:
+      - name: performance_type
+        description: "Type (employee/territory)"
+      - name: performance_id
+        description: "Employee or territory ID"
+      - name: monthly_revenue
+        description: "Monthly revenue"
+      - name: quota_achievement_percent
+        description: "Quota achievement percentage"
+      - name: quota_status
+        description: "Quota status"
+      - name: territory_performance
+        description: "Territory performance category"
+

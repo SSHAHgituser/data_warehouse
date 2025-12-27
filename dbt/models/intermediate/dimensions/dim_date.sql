@@ -13,7 +13,7 @@ with date_spine as (
 
 date_dimension as (
     select
-        date_day as date_key,
+        cast(to_char(date_day, 'YYYYMMDD') as integer) as date_key,
         date_day,
         date_part('year', date_day) as year,
         date_part('quarter', date_day) as quarter,
