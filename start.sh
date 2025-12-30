@@ -5,10 +5,9 @@
 # 1. PostgreSQL
 # 2. Streamlit
 # 3. dbt Documentation Server
-# 4. AdventureWorks Database (PostgreSQL, if not exists)
-# 5. SQL Server
-# 6. AdventureWorks Database (SQL Server, if not exists)
-# 7. Airbyte (installs abctl and Airbyte if needed, then starts)
+# 4. SQL Server
+# 5. AdventureWorks Database (SQL Server, if not exists)
+# 6. Airbyte (installs abctl and Airbyte if needed, then starts)
 
 set -e
 
@@ -56,36 +55,8 @@ docker-compose up -d dbt-docs
 echo -e "${GREEN}✓ dbt Documentation Server started${NC}"
 echo ""
 
-# Step 4: Check and Install AdventureWorks Database (if needed)
-echo -e "${YELLOW}Step 4: Checking AdventureWorks database...${NC}"
-# Wait a bit more to ensure PostgreSQL is fully ready for queries
-sleep 2
-ADVENTUREWORKS_EXISTS=$(docker exec data_warehouse_postgres psql -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='Adventureworks'" 2>/dev/null || echo "")
-if [ -z "$ADVENTUREWORKS_EXISTS" ]; then
-    echo -e "${YELLOW}   AdventureWorks database not found. Installing...${NC}"
-    echo -e "${YELLOW}   This may take several minutes...${NC}"
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    if [ -f "$SCRIPT_DIR/adventureworks/install_adventureworks.sh" ]; then
-        # Temporarily disable exit on error for this step (it's optional)
-        set +e
-        "$SCRIPT_DIR/adventureworks/install_adventureworks.sh"
-        INSTALL_RESULT=$?
-        set -e
-        if [ $INSTALL_RESULT -eq 0 ]; then
-            echo -e "${GREEN}✓ AdventureWorks database installed${NC}"
-        else
-            echo -e "${YELLOW}⚠ AdventureWorks installation failed. You can install it manually later.${NC}"
-        fi
-    else
-        echo -e "${YELLOW}⚠ AdventureWorks install script not found. Skipping installation.${NC}"
-    fi
-else
-    echo -e "${GREEN}✓ AdventureWorks database already exists${NC}"
-fi
-echo ""
-
-# Step 5: Start SQL Server
-echo -e "${YELLOW}Step 5: Starting SQL Server...${NC}"
+# Step 4: Start SQL Server
+echo -e "${YELLOW}Step 4: Starting SQL Server...${NC}"
 docker-compose up -d sqlserver
 echo -e "${GREEN}✓ SQL Server started${NC}"
 echo "   Waiting for SQL Server to be ready..."
@@ -110,8 +81,8 @@ if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
 fi
 echo ""
 
-# Step 6: Check and Install AdventureWorks Database on SQL Server (if needed)
-echo -e "${YELLOW}Step 6: Checking AdventureWorks database on SQL Server...${NC}"
+# Step 5: Check and Install AdventureWorks Database on SQL Server (if needed)
+echo -e "${YELLOW}Step 5: Checking AdventureWorks database on SQL Server...${NC}"
 sleep 2
 DB_EXISTS=$(docker exec data_warehouse_sqlserver /opt/mssql-tools18/bin/sqlcmd \
     -S localhost -U sa -P "$SQLSERVER_SA_PASSWORD" \
@@ -143,8 +114,8 @@ else
 fi
 echo ""
 
-# Step 7: Install and Start Airbyte
-echo -e "${YELLOW}Step 5: Checking Airbyte status...${NC}"
+# Step 6: Install and Start Airbyte
+echo -e "${YELLOW}Step 6: Checking Airbyte status...${NC}"
 
 # Ensure abctl is installed
 if ! command -v abctl &> /dev/null; then

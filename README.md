@@ -158,15 +158,15 @@ The Airbyte web UI will be available at `http://localhost:8000`.
 
 ### 5. (Optional) Install Adventure Works Sample Data
 
-The `./start.sh` script automatically installs AdventureWorks if it doesn't exist. To install manually:
+The `./start.sh` script automatically installs AdventureWorks on SQL Server if it doesn't exist. To install manually:
 
 ```bash
-./adventureworks/install_adventureworks.sh
+./adventureworks/install_adventureworks_sqlserver.sh
 ```
 
 This will:
-1. Start PostgreSQL if not running
-2. Download and install the Adventure Works database
+1. Start SQL Server if not running
+2. Download and restore the AdventureWorks2022 database
 3. Create the `Adventureworks` database
 
 See [adventureworks/README.md](adventureworks/README.md) for detailed installation instructions.
@@ -228,8 +228,8 @@ data_warehouse/
 │   ├── app.py                  # Main dashboard application
 │   └── README.md               # Streamlit-specific documentation
 ├── adventureworks/             # Adventure Works installation files
-│   ├── install_adventureworks.sh  # Installation script
-│   ├── cleanup_empty_schemas.sql  # Cleanup script
+│   ├── install_adventureworks_sqlserver.sh  # SQL Server installation script
+│   ├── README_SQLSERVER.md     # SQL Server installation documentation
 │   └── README.md               # Adventure Works documentation
 └── airbyte/                    # Airbyte Core setup
     ├── README.md               # Airbyte setup instructions
