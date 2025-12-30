@@ -1,10 +1,10 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    rowguid,
-    demographics,
-    modifieddate,
-    salespersonid,
-    businessentityid
-from {{ source('raw', 'store') }}
+    "Name" as name,
+    "rowguid" as rowguid,
+    "Demographics" as demographics,
+    "ModifiedDate" as modifieddate,
+    "SalesPersonID" as salespersonid,
+    "BusinessEntityID" as businessentityid
+from {{ source('raw_sales', 'Store') }}

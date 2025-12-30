@@ -1,9 +1,9 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    costrate,
-    locationid,
-    availability,
-    modifieddate
-from {{ source('raw', 'location') }}
+    "Name" as name,
+    "CostRate" as costrate,
+    "LocationID" as locationid,
+    "Availability" as availability,
+    "ModifiedDate" as modifieddate
+from {{ source('raw_production', 'Location') }}

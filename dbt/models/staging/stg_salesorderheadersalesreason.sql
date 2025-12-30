@@ -1,7 +1,7 @@
 {{ config(materialized='view') }}
 
 select
-    modifieddate,
-    salesorderid,
-    salesreasonid
-from {{ source('raw', 'salesorderheadersalesreason') }}
+    "ModifiedDate" as modifieddate,
+    "SalesOrderID" as salesorderid,
+    "SalesReasonID" as salesreasonid
+from {{ source('raw_sales', 'SalesOrderHeaderSalesReason') }}

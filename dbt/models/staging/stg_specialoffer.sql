@@ -1,15 +1,15 @@
 {{ config(materialized='view') }}
 
 select
-    type,
-    maxqty,
-    minqty,
-    enddate,
-    rowguid,
-    category,
-    startdate,
-    description,
-    discountpct,
-    modifieddate,
-    specialofferid
-from {{ source('raw', 'specialoffer') }}
+    "Type" as "type",
+    "MaxQty" as maxqty,
+    "MinQty" as minqty,
+    "EndDate" as enddate,
+    "rowguid" as rowguid,
+    "Category" as category,
+    "StartDate" as startdate,
+    "Description" as description,
+    "DiscountPct" as discountpct,
+    "ModifiedDate" as modifieddate,
+    "SpecialOfferID" as specialofferid
+from {{ source('raw_sales', 'SpecialOffer') }}

@@ -1,13 +1,13 @@
 {{ config(materialized='view') }}
 
 select
-    city,
-    rowguid,
-    addressid,
-    postalcode,
-    addressline1,
-    addressline2,
-    modifieddate,
-    spatiallocation,
-    stateprovinceid
-from {{ source('raw', 'address') }}
+    "City" as city,
+    "rowguid" as rowguid,
+    "AddressID" as addressid,
+    "PostalCode" as postalcode,
+    "AddressLine1" as addressline1,
+    "AddressLine2" as addressline2,
+    "ModifiedDate" as modifieddate,
+    "SpatialLocation" as spatiallocation,
+    "StateProvinceID" as stateprovinceid
+from {{ source('raw_person', 'Address') }}

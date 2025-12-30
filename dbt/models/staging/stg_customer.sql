@@ -1,10 +1,11 @@
 {{ config(materialized='view') }}
 
 select
-    rowguid,
-    storeid,
-    personid,
-    customerid,
-    territoryid,
-    modifieddate
-from {{ source('raw', 'customer') }}
+    "StoreID" as storeid,
+    "rowguid" as rowguid,
+    "PersonID" as personid,
+    "CustomerID" as customerid,
+    "TerritoryID" as territoryid,
+    "ModifiedDate" as modifieddate,
+    "AccountNumber" as accountnumber
+from {{ source('raw_sales', 'Customer') }}

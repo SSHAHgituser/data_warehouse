@@ -1,9 +1,9 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    cultureid,
-    productid,
-    description,
-    productmodel
-from {{ source('raw', 'vproductanddescription') }}
+    "Name" as name,
+    "CultureID" as cultureid,
+    "ProductID" as productid,
+    "Description" as description,
+    "ProductModel" as productmodel
+from {{ source('raw_production', 'vProductAndDescription') }}

@@ -1,9 +1,9 @@
 {{ config(materialized='view') }}
 
 select
-    rowguid,
-    quotadate,
-    salesquota,
-    modifieddate,
-    businessentityid
-from {{ source('raw', 'salespersonquotahistory') }}
+    "rowguid" as rowguid,
+    "QuotaDate" as quotadate,
+    "SalesQuota" as salesquota,
+    "ModifiedDate" as modifieddate,
+    "BusinessEntityID" as businessentityid
+from {{ source('raw_sales', 'SalesPersonQuotaHistory') }}

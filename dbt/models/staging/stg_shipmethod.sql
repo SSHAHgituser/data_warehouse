@@ -1,10 +1,10 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    rowguid,
-    shipbase,
-    shiprate,
-    modifieddate,
-    shipmethodid
-from {{ source('raw', 'shipmethod') }}
+    "Name" as name,
+    "rowguid" as rowguid,
+    "ShipBase" as shipbase,
+    "ShipRate" as shiprate,
+    "ModifiedDate" as modifieddate,
+    "ShipMethodID" as shipmethodid
+from {{ source('raw_purchasing', 'ShipMethod') }}

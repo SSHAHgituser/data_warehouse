@@ -1,17 +1,17 @@
 {{ config(materialized='view') }}
 
 select
-    gender,
-    birthdate,
-    education,
-    occupation,
-    yearlyincome,
-    homeownerflag,
-    maritalstatus,
-    totalchildren,
-    numbercarsowned,
-    businessentityid,
-    totalpurchaseytd,
-    datefirstpurchase,
-    numberchildrenathome
-from {{ source('raw', 'vpersondemographics') }}
+    "Gender" as gender,
+    "BirthDate" as birthdate,
+    "Education" as education,
+    "Occupation" as occupation,
+    "YearlyIncome" as yearlyincome,
+    "HomeOwnerFlag" as homeownerflag,
+    "MaritalStatus" as maritalstatus,
+    "TotalChildren" as totalchildren,
+    "NumberCarsOwned" as numbercarsowned,
+    "BusinessEntityID" as businessentityid,
+    "TotalPurchaseYTD" as totalpurchaseytd,
+    "DateFirstPurchase" as datefirstpurchase,
+    "NumberChildrenAtHome" as numberchildrenathome
+from {{ source('raw_sales', 'vPersonDemographics') }}

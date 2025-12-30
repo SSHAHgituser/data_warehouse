@@ -1,12 +1,12 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    activeflag,
-    creditrating,
-    modifieddate,
-    accountnumber,
-    businessentityid,
-    preferredvendorstatus,
-    purchasingwebserviceurl
-from {{ source('raw', 'vendor') }}
+    "Name" as name,
+    "ActiveFlag" as activeflag,
+    "CreditRating" as creditrating,
+    "ModifiedDate" as modifieddate,
+    "AccountNumber" as accountnumber,
+    "BusinessEntityID" as businessentityid,
+    "PreferredVendorStatus" as preferredvendorstatus,
+    "PurchasingWebServiceURL" as purchasingwebserviceurl
+from {{ source('raw_purchasing', 'Vendor') }}

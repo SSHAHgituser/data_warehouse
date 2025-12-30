@@ -1,14 +1,14 @@
 {{ config(materialized='view') }}
 
 select
-    title,
-    suffix,
-    jobtitle,
-    lastname,
-    firstname,
-    groupname,
-    startdate,
-    department,
-    middlename,
-    businessentityid
-from {{ source('raw', 'vemployeedepartment') }}
+    "Title" as title,
+    "Suffix" as suffix,
+    "JobTitle" as jobtitle,
+    "LastName" as lastname,
+    "FirstName" as firstname,
+    "GroupName" as groupname,
+    "StartDate" as startdate,
+    "Department" as department,
+    "MiddleName" as middlename,
+    "BusinessEntityID" as businessentityid
+from {{ source('raw_hr', 'vEmployeeDepartment') }}

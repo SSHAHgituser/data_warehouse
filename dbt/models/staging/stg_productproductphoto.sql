@@ -1,8 +1,8 @@
 {{ config(materialized='view') }}
 
 select
-    "primary",
-    productid,
-    modifieddate,
-    productphotoid
-from {{ source('raw', 'productproductphoto') }}
+    "Primary" as "primary",
+    "ProductID" as productid,
+    "ModifiedDate" as modifieddate,
+    "ProductPhotoID" as productphotoid
+from {{ source('raw_production', 'ProductProductPhoto') }}

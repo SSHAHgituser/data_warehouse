@@ -1,7 +1,7 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    modifieddate,
-    scrapreasonid
-from {{ source('raw', 'scrapreason') }}
+    "Name" as name,
+    "ModifiedDate" as modifieddate,
+    "ScrapReasonID" as scrapreasonid
+from {{ source('raw_production', 'ScrapReason') }}

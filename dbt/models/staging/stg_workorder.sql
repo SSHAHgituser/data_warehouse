@@ -1,13 +1,14 @@
 {{ config(materialized='view') }}
 
 select
-    duedate,
-    enddate,
-    orderqty,
-    productid,
-    startdate,
-    scrappedqty,
-    workorderid,
-    modifieddate,
-    scrapreasonid
-from {{ source('raw', 'workorder') }}
+    "DueDate" as duedate,
+    "EndDate" as enddate,
+    "OrderQty" as orderqty,
+    "ProductID" as productid,
+    "StartDate" as startdate,
+    "StockedQty" as stockedqty,
+    "ScrappedQty" as scrappedqty,
+    "WorkOrderID" as workorderid,
+    "ModifiedDate" as modifieddate,
+    "ScrapReasonID" as scrapreasonid
+from {{ source('raw_production', 'WorkOrder') }}

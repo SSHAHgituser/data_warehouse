@@ -1,17 +1,17 @@
 {{ config(materialized='view') }}
 
 select
-    "Edu_GPA",
-    "Edu_Level",
-    "Edu_Major",
-    "Edu_Minor",
-    "Edu_Degree",
-    "Edu_School",
-    "Edu_EndDate",
-    "Edu_GPAScale",
-    "Edu_Loc_City",
-    "Edu_Loc_State",
-    "Edu_StartDate",
-    jobcandidateid,
-    "Edu_Loc_CountryRegion"
-from {{ source('raw', 'vjobcandidateeducation') }}
+    "Edu_GPA" as edu_gpa,
+    "Edu_Level" as edu_level,
+    "Edu_Major" as edu_major,
+    "Edu_Minor" as edu_minor,
+    "Edu_Degree" as edu_degree,
+    "Edu_School" as edu_school,
+    "Edu_EndDate" as edu_enddate,
+    "Edu_GPAScale" as edu_gpascale,
+    "Edu_Loc_City" as edu_loc_city,
+    "Edu_Loc_State" as edu_loc_state,
+    "Edu_StartDate" as edu_startdate,
+    "JobCandidateID" as jobcandidateid,
+    "Edu_Loc_CountryRegion" as edu_loc_countryregion
+from {{ source('raw_hr', 'vJobCandidateEducation') }}

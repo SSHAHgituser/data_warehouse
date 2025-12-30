@@ -1,7 +1,7 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    modifieddate,
-    contacttypeid
-from {{ source('raw', 'contacttype') }}
+    "Name" as name,
+    "ModifiedDate" as modifieddate,
+    "ContactTypeID" as contacttypeid
+from {{ source('raw_person', 'ContactType') }}

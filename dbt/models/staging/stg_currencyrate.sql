@@ -1,11 +1,11 @@
 {{ config(materialized='view') }}
 
 select
-    averagerate,
-    endofdayrate,
-    modifieddate,
-    currencyrateid,
-    tocurrencycode,
-    currencyratedate,
-    fromcurrencycode
-from {{ source('raw', 'currencyrate') }}
+    "AverageRate" as averagerate,
+    "EndOfDayRate" as endofdayrate,
+    "ModifiedDate" as modifieddate,
+    "CurrencyRateID" as currencyrateid,
+    "ToCurrencyCode" as tocurrencycode,
+    "CurrencyRateDate" as currencyratedate,
+    "FromCurrencyCode" as fromcurrencycode
+from {{ source('raw_sales', 'CurrencyRate') }}

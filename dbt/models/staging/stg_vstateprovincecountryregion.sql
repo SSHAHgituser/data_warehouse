@@ -1,11 +1,11 @@
 {{ config(materialized='view') }}
 
 select
-    territoryid,
-    stateprovinceid,
-    countryregioncode,
-    countryregionname,
-    stateprovincecode,
-    stateprovincename,
-    isonlystateprovinceflag
-from {{ source('raw', 'vstateprovincecountryregion') }}
+    "TerritoryID" as territoryid,
+    "StateProvinceID" as stateprovinceid,
+    "CountryRegionCode" as countryregioncode,
+    "CountryRegionName" as countryregionname,
+    "StateProvinceCode" as stateprovincecode,
+    "StateProvinceName" as stateprovincename,
+    "IsOnlyStateProvinceFlag" as isonlystateprovinceflag
+from {{ source('raw_person', 'vStateProvinceCountryRegion') }}

@@ -1,10 +1,10 @@
 {{ config(materialized='view') }}
 
 select
-    expyear,
-    cardtype,
-    expmonth,
-    cardnumber,
-    creditcardid,
-    modifieddate
-from {{ source('raw', 'creditcard') }}
+    "ExpYear" as expyear,
+    "CardType" as cardtype,
+    "ExpMonth" as expmonth,
+    "CardNumber" as cardnumber,
+    "CreditCardID" as creditcardid,
+    "ModifiedDate" as modifieddate
+from {{ source('raw_sales', 'CreditCard') }}

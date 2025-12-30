@@ -257,6 +257,7 @@ echo "Service URLs:"
 echo "  📊 PostgreSQL:     localhost:5432"
 echo "  📈 Streamlit:      http://localhost:8501"
 echo "  📚 dbt Docs:       http://localhost:8080"
+echo "  🗄️  SQL Server:    localhost:1433"
 if command -v abctl &> /dev/null; then
     AIRBYTE_STATUS=$(abctl local status 2>&1 || echo "")
     if echo "$AIRBYTE_STATUS" | grep -qi "running\|installed"; then

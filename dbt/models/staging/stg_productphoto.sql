@@ -1,10 +1,10 @@
 {{ config(materialized='view') }}
 
 select
-    largephoto,
-    modifieddate,
-    productphotoid,
-    thumbnailphoto,
-    largephotofilename,
-    thumbnailphotofilename
-from {{ source('raw', 'productphoto') }}
+    "LargePhoto" as largephoto,
+    "ModifiedDate" as modifieddate,
+    "ProductPhotoID" as productphotoid,
+    "ThumbNailPhoto" as thumbnailphoto,
+    "LargePhotoFileName" as largephotofilename,
+    "ThumbnailPhotoFileName" as thumbnailphotofilename
+from {{ source('raw_production', 'ProductPhoto') }}

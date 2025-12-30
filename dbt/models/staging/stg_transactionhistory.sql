@@ -1,13 +1,13 @@
 {{ config(materialized='view') }}
 
 select
-    quantity,
-    productid,
-    actualcost,
-    modifieddate,
-    transactionid,
-    transactiondate,
-    transactiontype,
-    referenceorderid,
-    referenceorderlineid
-from {{ source('raw', 'transactionhistory') }}
+    "Quantity" as quantity,
+    "ProductID" as productid,
+    "ActualCost" as actualcost,
+    "ModifiedDate" as modifieddate,
+    "TransactionID" as transactionid,
+    "TransactionDate" as transactiondate,
+    "TransactionType" as transactiontype,
+    "ReferenceOrderID" as referenceorderid,
+    "ReferenceOrderLineID" as referenceorderlineid
+from {{ source('raw_production', 'TransactionHistory') }}

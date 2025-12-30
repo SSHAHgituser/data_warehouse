@@ -1,9 +1,9 @@
 {{ config(materialized='view') }}
 
 select
-    enddate,
-    productid,
-    startdate,
-    modifieddate,
-    standardcost
-from {{ source('raw', 'productcosthistory') }}
+    "EndDate" as enddate,
+    "ProductID" as productid,
+    "StartDate" as startdate,
+    "ModifiedDate" as modifieddate,
+    "StandardCost" as standardcost
+from {{ source('raw_production', 'ProductCostHistory') }}

@@ -1,7 +1,7 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    modifieddate,
-    countryregioncode
-from {{ source('raw', 'countryregion') }}
+    "Name" as name,
+    "ModifiedDate" as modifieddate,
+    "CountryRegionCode" as countryregioncode
+from {{ source('raw_person', 'CountryRegion') }}

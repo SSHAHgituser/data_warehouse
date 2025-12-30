@@ -1,7 +1,7 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    currencycode,
-    modifieddate
-from {{ source('raw', 'currency') }}
+    "Name" as name,
+    "CurrencyCode" as currencycode,
+    "ModifiedDate" as modifieddate
+from {{ source('raw_sales', 'Currency') }}

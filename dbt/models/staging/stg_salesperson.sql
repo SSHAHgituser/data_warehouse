@@ -1,13 +1,13 @@
 {{ config(materialized='view') }}
 
 select
-    bonus,
-    rowguid,
-    salesytd,
-    salesquota,
-    territoryid,
-    modifieddate,
-    commissionpct,
-    saleslastyear,
-    businessentityid
-from {{ source('raw', 'salesperson') }}
+    "Bonus" as bonus,
+    "rowguid" as rowguid,
+    "SalesYTD" as salesytd,
+    "SalesQuota" as salesquota,
+    "TerritoryID" as territoryid,
+    "ModifiedDate" as modifieddate,
+    "CommissionPct" as commissionpct,
+    "SalesLastYear" as saleslastyear,
+    "BusinessEntityID" as businessentityid
+from {{ source('raw_sales', 'SalesPerson') }}

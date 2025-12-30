@@ -1,9 +1,9 @@
 {{ config(materialized='view') }}
 
 select
-    enddate,
-    listprice,
-    productid,
-    startdate,
-    modifieddate
-from {{ source('raw', 'productlistpricehistory') }}
+    "EndDate" as enddate,
+    "ListPrice" as listprice,
+    "ProductID" as productid,
+    "StartDate" as startdate,
+    "ModifiedDate" as modifieddate
+from {{ source('raw_production', 'ProductListPriceHistory') }}

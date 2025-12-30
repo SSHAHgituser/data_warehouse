@@ -1,8 +1,8 @@
 {{ config(materialized='view') }}
 
 select
-    resume,
-    modifieddate,
-    jobcandidateid,
-    businessentityid
-from {{ source('raw', 'jobcandidate') }}
+    "Resume" as resume,
+    "ModifiedDate" as modifieddate,
+    "JobCandidateID" as jobcandidateid,
+    "BusinessEntityID" as businessentityid
+from {{ source('raw_hr', 'JobCandidate') }}

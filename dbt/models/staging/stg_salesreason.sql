@@ -1,8 +1,8 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    reasontype,
-    modifieddate,
-    salesreasonid
-from {{ source('raw', 'salesreason') }}
+    "Name" as name,
+    "ReasonType" as reasontype,
+    "ModifiedDate" as modifieddate,
+    "SalesReasonID" as salesreasonid
+from {{ source('raw_sales', 'SalesReason') }}

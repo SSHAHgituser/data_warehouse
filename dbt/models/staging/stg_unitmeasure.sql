@@ -1,7 +1,7 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    modifieddate,
-    unitmeasurecode
-from {{ source('raw', 'unitmeasure') }}
+    "Name" as name,
+    "ModifiedDate" as modifieddate,
+    "UnitMeasureCode" as unitmeasurecode
+from {{ source('raw_production', 'UnitMeasure') }}

@@ -1,7 +1,7 @@
 {{ config(materialized='view') }}
 
 select
-    currencycode,
-    modifieddate,
-    countryregioncode
-from {{ source('raw', 'countryregioncurrency') }}
+    "CurrencyCode" as currencycode,
+    "ModifiedDate" as modifieddate,
+    "CountryRegionCode" as countryregioncode
+from {{ source('raw_sales', 'CountryRegionCurrency') }}

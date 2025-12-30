@@ -1,7 +1,7 @@
 {{ config(materialized='view') }}
 
 select
-    diagram,
-    modifieddate,
-    illustrationid
-from {{ source('raw', 'illustration') }}
+    "Diagram" as diagram,
+    "ModifiedDate" as modifieddate,
+    "IllustrationID" as illustrationid
+from {{ source('raw_production', 'Illustration') }}

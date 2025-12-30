@@ -1,8 +1,8 @@
 {{ config(materialized='view') }}
 
 select
-    cultureid,
-    modifieddate,
-    productmodelid,
-    productdescriptionid
-from {{ source('raw', 'productmodelproductdescriptionculture') }}
+    "CultureID" as cultureid,
+    "ModifiedDate" as modifieddate,
+    "ProductModelID" as productmodelid,
+    "ProductDescriptionID" as productdescriptionid
+from {{ source('raw_production', 'ProductModelProductDescriptionCulture') }}

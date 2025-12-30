@@ -1,10 +1,10 @@
 {{ config(materialized='view') }}
 
 select
-    enddate,
-    shiftid,
-    startdate,
-    departmentid,
-    modifieddate,
-    businessentityid
-from {{ source('raw', 'employeedepartmenthistory') }}
+    "EndDate" as enddate,
+    "ShiftID" as shiftid,
+    "StartDate" as startdate,
+    "DepartmentID" as departmentid,
+    "ModifiedDate" as modifieddate,
+    "BusinessEntityID" as businessentityid
+from {{ source('raw_hr', 'EmployeeDepartmentHistory') }}

@@ -1,186 +1,208 @@
 version: 2
 
 sources:
-  - name: raw
-    description: "Raw data from public schema in data_warehouse database"
-    schema: public
+  # HumanResources Schema
+  - name: raw_hr
+    description: "Raw data from HumanResources schema"
+    schema: HumanResources
     tables:
-      - name: address
-        description: "Address table"
-      - name: addresstype
-        description: "Address type table"
-      - name: billofmaterials
-        description: "Bill of materials table"
-      - name: businessentity
-        description: "Business entity table"
-      - name: businessentityaddress
-        description: "Business entity address table"
-      - name: businessentitycontact
-        description: "Business entity contact table"
-      - name: contacttype
-        description: "Contact type table"
-      - name: countryregion
-        description: "Country region table"
-      - name: countryregioncurrency
-        description: "Country region currency table"
-      - name: creditcard
-        description: "Credit card table"
-      - name: culture
-        description: "Culture table"
-      - name: currency
-        description: "Currency table"
-      - name: currencyrate
-        description: "Currency rate table"
-      - name: customer
-        description: "Customer table"
-      - name: department
+      - name: Department
         description: "Department table"
-      - name: document
-        description: "Document table"
-      - name: emailaddress
-        description: "Email address table"
-      - name: employee
+      - name: Employee
         description: "Employee table"
-      - name: employeedepartmenthistory
+      - name: EmployeeDepartmentHistory
         description: "Employee department history table"
-      - name: employeepayhistory
+      - name: EmployeePayHistory
         description: "Employee pay history table"
-      - name: illustration
-        description: "Illustration table"
-      - name: jobcandidate
+      - name: JobCandidate
         description: "Job candidate table"
-      - name: location
-        description: "Location table"
-      - name: password
-        description: "Password table"
-      - name: person
-        description: "Person table"
-      - name: personcreditcard
-        description: "Person credit card table"
-      - name: personphone
-        description: "Person phone table"
-      - name: phonenumbertype
-        description: "Phone number type table"
-      - name: product
-        description: "Product table"
-      - name: productcategory
-        description: "Product category table"
-      - name: productcosthistory
-        description: "Product cost history table"
-      - name: productdescription
-        description: "Product description table"
-      - name: productdocument
-        description: "Product document table"
-      - name: productinventory
-        description: "Product inventory table"
-      - name: productlistpricehistory
-        description: "Product list price history table"
-      - name: productmodel
-        description: "Product model table"
-      - name: productmodelillustration
-        description: "Product model illustration table"
-      - name: productmodelproductdescriptionculture
-        description: "Product model product description culture table"
-      - name: productphoto
-        description: "Product photo table"
-      - name: productproductphoto
-        description: "Product product photo table"
-      - name: productreview
-        description: "Product review table"
-      - name: productsubcategory
-        description: "Product subcategory table"
-      - name: productvendor
-        description: "Product vendor table"
-      - name: purchaseorderdetail
-        description: "Purchase order detail table"
-      - name: purchaseorderheader
-        description: "Purchase order header table"
-      - name: salesorderdetail
-        description: "Sales order detail table"
-      - name: salesorderheader
-        description: "Sales order header table"
-      - name: salesorderheadersalesreason
-        description: "Sales order header sales reason table"
-      - name: salesperson
-        description: "Sales person table"
-      - name: salespersonquotahistory
-        description: "Sales person quota history table"
-      - name: salesreason
-        description: "Sales reason table"
-      - name: salestaxrate
-        description: "Sales tax rate table"
-      - name: salesterritory
-        description: "Sales territory table"
-      - name: salesterritoryhistory
-        description: "Sales territory history table"
-      - name: scrapreason
-        description: "Scrap reason table"
-      - name: shift
+      - name: Shift
         description: "Shift table"
-      - name: shipmethod
-        description: "Ship method table"
-      - name: shoppingcartitem
-        description: "Shopping cart item table"
-      - name: specialoffer
-        description: "Special offer table"
-      - name: specialofferproduct
-        description: "Special offer product table"
-      - name: stateprovince
-        description: "State province table"
-      - name: store
-        description: "Store table"
-      - name: transactionhistory
-        description: "Transaction history table"
-      - name: transactionhistoryarchive
-        description: "Transaction history archive table"
-      - name: unitmeasure
-        description: "Unit measure table"
-      - name: vadditionalcontactinfo
-        description: "View: Additional contact info"
-      - name: vemployee
+      - name: vEmployee
         description: "View: Employee"
-      - name: vemployeedepartment
+      - name: vEmployeeDepartment
         description: "View: Employee department"
-      - name: vemployeedepartmenthistory
+      - name: vEmployeeDepartmentHistory
         description: "View: Employee department history"
-      - name: vendor
-        description: "Vendor table"
-      - name: vindividualcustomer
-        description: "View: Individual customer"
-      - name: vjobcandidate
+      - name: vJobCandidate
         description: "View: Job candidate"
-      - name: vjobcandidateeducation
+      - name: vJobCandidateEducation
         description: "View: Job candidate education"
-      - name: vjobcandidateemployment
+      - name: vJobCandidateEmployment
         description: "View: Job candidate employment"
-      - name: vpersondemographics
-        description: "View: Person demographics"
-      - name: vproductanddescription
-        description: "View: Product and description"
-      - name: vproductmodelcatalogdescription
-        description: "View: Product model catalog description"
-      - name: vproductmodelinstructions
-        description: "View: Product model instructions"
-      - name: vsalesperson
-        description: "View: Sales person"
-      - name: vsalespersonsalesbyfiscalyears
-        description: "View: Sales person sales by fiscal years"
-      - name: vsalespersonsalesbyfiscalyearsdata
-        description: "View: Sales person sales by fiscal years data"
-      - name: vstateprovincecountryregion
-        description: "View: State province country region"
-      - name: vstorewithaddresses
-        description: "View: Store with addresses"
-      - name: vstorewithcontacts
-        description: "View: Store with contacts"
-      - name: vstorewithdemographics
-        description: "View: Store with demographics"
-      - name: vvendorwithaddresses
-        description: "View: Vendor with addresses"
-      - name: vvendorwithcontacts
-        description: "View: Vendor with contacts"
-      - name: workorder
-        description: "Work order table"
-      - name: workorderrouting
-        description: "Work order routing table"
 
+  # Person Schema
+  - name: raw_person
+    description: "Raw data from Person schema"
+    schema: Person
+    tables:
+      - name: Address
+        description: "Address table"
+      - name: AddressType
+        description: "Address type table"
+      - name: BusinessEntity
+        description: "Business entity table"
+      - name: BusinessEntityAddress
+        description: "Business entity address table"
+      - name: BusinessEntityContact
+        description: "Business entity contact table"
+      - name: ContactType
+        description: "Contact type table"
+      - name: CountryRegion
+        description: "Country region table"
+      - name: EmailAddress
+        description: "Email address table"
+      - name: Password
+        description: "Password table"
+      - name: Person
+        description: "Person table"
+      - name: PersonPhone
+        description: "Person phone table"
+      - name: PhoneNumberType
+        description: "Phone number type table"
+      - name: StateProvince
+        description: "State province table"
+      - name: vAdditionalContactInfo
+        description: "View: Additional contact info"
+      - name: vStateProvinceCountryRegion
+        description: "View: State province country region"
+
+  # Production Schema
+  - name: raw_production
+    description: "Raw data from Production schema"
+    schema: Production
+    tables:
+      - name: BillOfMaterials
+        description: "Bill of materials table"
+      - name: Culture
+        description: "Culture table"
+      - name: Document
+        description: "Document table"
+      - name: Illustration
+        description: "Illustration table"
+      - name: Location
+        description: "Location table"
+      - name: Product
+        description: "Product table"
+      - name: ProductCategory
+        description: "Product category table"
+      - name: ProductCostHistory
+        description: "Product cost history table"
+      - name: ProductDescription
+        description: "Product description table"
+      - name: ProductDocument
+        description: "Product document table"
+      - name: ProductInventory
+        description: "Product inventory table"
+      - name: ProductListPriceHistory
+        description: "Product list price history table"
+      - name: ProductModel
+        description: "Product model table"
+      - name: ProductModelIllustration
+        description: "Product model illustration table"
+      - name: ProductModelProductDescriptionCulture
+        description: "Product model product description culture table"
+      - name: ProductPhoto
+        description: "Product photo table"
+      - name: ProductProductPhoto
+        description: "Product product photo table"
+      - name: ProductReview
+        description: "Product review table"
+      - name: ProductSubcategory
+        description: "Product subcategory table"
+      - name: ScrapReason
+        description: "Scrap reason table"
+      - name: TransactionHistory
+        description: "Transaction history table"
+      - name: TransactionHistoryArchive
+        description: "Transaction history archive table"
+      - name: UnitMeasure
+        description: "Unit measure table"
+      - name: WorkOrder
+        description: "Work order table"
+      - name: WorkOrderRouting
+        description: "Work order routing table"
+      - name: vProductAndDescription
+        description: "View: Product and description"
+      - name: vProductModelCatalogDescription
+        description: "View: Product model catalog description"
+      - name: vProductModelInstructions
+        description: "View: Product model instructions"
+
+  # Purchasing Schema
+  - name: raw_purchasing
+    description: "Raw data from Purchasing schema"
+    schema: Purchasing
+    tables:
+      - name: ProductVendor
+        description: "Product vendor table"
+      - name: PurchaseOrderDetail
+        description: "Purchase order detail table"
+      - name: PurchaseOrderHeader
+        description: "Purchase order header table"
+      - name: ShipMethod
+        description: "Ship method table"
+      - name: Vendor
+        description: "Vendor table"
+      - name: vVendorWithAddresses
+        description: "View: Vendor with addresses"
+      - name: vVendorWithContacts
+        description: "View: Vendor with contacts"
+
+  # Sales Schema
+  - name: raw_sales
+    description: "Raw data from Sales schema"
+    schema: Sales
+    tables:
+      - name: CountryRegionCurrency
+        description: "Country region currency table"
+      - name: CreditCard
+        description: "Credit card table"
+      - name: Currency
+        description: "Currency table"
+      - name: CurrencyRate
+        description: "Currency rate table"
+      - name: Customer
+        description: "Customer table"
+      - name: PersonCreditCard
+        description: "Person credit card table"
+      - name: SalesOrderDetail
+        description: "Sales order detail table"
+      - name: SalesOrderHeader
+        description: "Sales order header table"
+      - name: SalesOrderHeaderSalesReason
+        description: "Sales order header sales reason table"
+      - name: SalesPerson
+        description: "Sales person table"
+      - name: SalesPersonQuotaHistory
+        description: "Sales person quota history table"
+      - name: SalesReason
+        description: "Sales reason table"
+      - name: SalesTaxRate
+        description: "Sales tax rate table"
+      - name: SalesTerritory
+        description: "Sales territory table"
+      - name: SalesTerritoryHistory
+        description: "Sales territory history table"
+      - name: ShoppingCartItem
+        description: "Shopping cart item table"
+      - name: SpecialOffer
+        description: "Special offer table"
+      - name: SpecialOfferProduct
+        description: "Special offer product table"
+      - name: Store
+        description: "Store table"
+      - name: vIndividualCustomer
+        description: "View: Individual customer"
+      - name: vPersonDemographics
+        description: "View: Person demographics"
+      - name: vSalesPerson
+        description: "View: Sales person"
+      - name: vSalesPersonSalesByFiscalYears
+        description: "View: Sales person sales by fiscal years"
+      - name: vStoreWithAddresses
+        description: "View: Store with addresses"
+      - name: vStoreWithContacts
+        description: "View: Store with contacts"
+      - name: vStoreWithDemographics
+        description: "View: Store with demographics"

@@ -1,10 +1,10 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    rowguid,
-    instructions,
-    modifieddate,
-    productmodelid,
-    catalogdescription
-from {{ source('raw', 'productmodel') }}
+    "Name" as name,
+    "rowguid" as rowguid,
+    "Instructions" as instructions,
+    "ModifiedDate" as modifieddate,
+    "ProductModelID" as productmodelid,
+    "CatalogDescription" as catalogdescription
+from {{ source('raw_production', 'ProductModel') }}

@@ -1,8 +1,8 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    groupname,
-    departmentid,
-    modifieddate
-from {{ source('raw', 'department') }}
+    "Name" as name,
+    "GroupName" as groupname,
+    "DepartmentID" as departmentid,
+    "ModifiedDate" as modifieddate
+from {{ source('raw_hr', 'Department') }}

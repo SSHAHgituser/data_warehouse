@@ -17,8 +17,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - data_warehouse_network
 
   streamlit:
     build:
@@ -45,8 +43,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    networks:
-      - data_warehouse_network
     depends_on:
       - postgres
 
@@ -72,8 +68,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-    networks:
-      - data_warehouse_network
     depends_on:
       postgres:
         condition: service_healthy
@@ -98,16 +92,10 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
-    networks:
-      - data_warehouse_network
 
 volumes:
   postgres_data:
     driver: local
   sqlserver_data:
     driver: local
-
-networks:
-  data_warehouse_network:
-    driver: bridge
 

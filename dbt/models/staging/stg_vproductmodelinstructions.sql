@@ -1,15 +1,15 @@
 {{ config(materialized='view') }}
 
 select
-    "Step",
-    name,
-    "LotSize",
-    rowguid,
-    "LaborHours",
-    "LocationID",
-    "SetupHours",
-    "MachineHours",
-    instructions,
-    modifieddate,
-    productmodelid
-from {{ source('raw', 'vproductmodelinstructions') }}
+    "Name" as name,
+    "Step" as step,
+    "LotSize" as lotsize,
+    "rowguid" as rowguid,
+    "LaborHours" as laborhours,
+    "LocationID" as locationid,
+    "SetupHours" as setuphours,
+    "Instructions" as instructions,
+    "MachineHours" as machinehours,
+    "ModifiedDate" as modifieddate,
+    "ProductModelID" as productmodelid
+from {{ source('raw_production', 'vProductModelInstructions') }}

@@ -1,9 +1,9 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    endtime,
-    shiftid,
-    starttime,
-    modifieddate
-from {{ source('raw', 'shift') }}
+    "Name" as name,
+    "EndTime" as endtime,
+    "ShiftID" as shiftid,
+    "StartTime" as starttime,
+    "ModifiedDate" as modifieddate
+from {{ source('raw_hr', 'Shift') }}

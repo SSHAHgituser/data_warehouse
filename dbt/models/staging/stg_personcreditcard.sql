@@ -1,7 +1,7 @@
 {{ config(materialized='view') }}
 
 select
-    creditcardid,
-    modifieddate,
-    businessentityid
-from {{ source('raw', 'personcreditcard') }}
+    "CreditCardID" as creditcardid,
+    "ModifiedDate" as modifieddate,
+    "BusinessEntityID" as businessentityid
+from {{ source('raw_sales', 'PersonCreditCard') }}

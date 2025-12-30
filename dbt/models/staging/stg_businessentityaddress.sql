@@ -1,9 +1,9 @@
 {{ config(materialized='view') }}
 
 select
-    rowguid,
-    addressid,
-    modifieddate,
-    addresstypeid,
-    businessentityid
-from {{ source('raw', 'businessentityaddress') }}
+    "rowguid" as rowguid,
+    "AddressID" as addressid,
+    "ModifiedDate" as modifieddate,
+    "AddressTypeID" as addresstypeid,
+    "BusinessEntityID" as businessentityid
+from {{ source('raw_person', 'BusinessEntityAddress') }}

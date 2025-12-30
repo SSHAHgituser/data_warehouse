@@ -1,9 +1,9 @@
 {{ config(materialized='view') }}
 
 select
-    name,
-    rowguid,
-    modifieddate,
-    productcategoryid,
-    productsubcategoryid
-from {{ source('raw', 'productsubcategory') }}
+    "Name" as name,
+    "rowguid" as rowguid,
+    "ModifiedDate" as modifieddate,
+    "ProductCategoryID" as productcategoryid,
+    "ProductSubcategoryID" as productsubcategoryid
+from {{ source('raw_production', 'ProductSubcategory') }}

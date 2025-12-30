@@ -1,9 +1,9 @@
 {{ config(materialized='view') }}
 
 select
-    rowguid,
-    modifieddate,
-    passwordhash,
-    passwordsalt,
-    businessentityid
-from {{ source('raw', 'password') }}
+    "rowguid" as rowguid,
+    "ModifiedDate" as modifieddate,
+    "PasswordHash" as passwordhash,
+    "PasswordSalt" as passwordsalt,
+    "BusinessEntityID" as businessentityid
+from {{ source('raw_person', 'Password') }}
