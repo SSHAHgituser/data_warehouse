@@ -115,7 +115,7 @@ fi
 echo ""
 
 # Step 6: Install and Start Airbyte
-echo -e "${YELLOW}Step 6: Checking Airbyte status...${NC}"
+echo -e "${YELLOW}Step 6: Installing and starting Airbyte...${NC}"
 
 # Ensure abctl is installed
 if ! command -v abctl &> /dev/null; then

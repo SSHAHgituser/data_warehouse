@@ -46,7 +46,7 @@ If you prefer manual installation or the script fails:
    ```bash
    # Check if SQL Server is ready
    docker exec data_warehouse_sqlserver /opt/mssql-tools18/bin/sqlcmd \
-     -S localhost -U sa -P "YourStrong@Passw0rd" \
+     -S localhost -U sa -P "YourStrong@Passw0rd" -C \
      -Q "SELECT 1"
    ```
 
@@ -64,7 +64,7 @@ If you prefer manual installation or the script fails:
 5. **Restore the database:**
    ```bash
    docker exec data_warehouse_sqlserver /opt/mssql-tools18/bin/sqlcmd \
-     -S localhost -U sa -P "YourStrong@Passw0rd" \
+     -S localhost -U sa -P "YourStrong@Passw0rd" -C \
      -Q "RESTORE DATABASE AdventureWorks2022 FROM DISK = '/var/opt/mssql/backup/AdventureWorks2022.bak' WITH MOVE 'AdventureWorks2022' TO '/var/opt/mssql/data/AdventureWorks2022.mdf', MOVE 'AdventureWorks2022_Log' TO '/var/opt/mssql/data/AdventureWorks2022_Log.ldf', REPLACE;"
    ```
 
@@ -75,7 +75,7 @@ After installation, verify the database:
 ```bash
 # Connect to database
 docker exec -it data_warehouse_sqlserver /opt/mssql-tools18/bin/sqlcmd \
-  -S localhost -U sa -P "YourStrong@Passw0rd" \
+  -S localhost -U sa -P "YourStrong@Passw0rd" -C \
   -d AdventureWorks2022
 
 # List tables
@@ -142,7 +142,7 @@ If the database already exists, drop it first:
 
 ```bash
 docker exec data_warehouse_sqlserver /opt/mssql-tools18/bin/sqlcmd \
-  -S localhost -U sa -P "YourStrong@Passw0rd" \
+  -S localhost -U sa -P "YourStrong@Passw0rd" -C \
   -Q "DROP DATABASE AdventureWorks2022;"
 ```
 

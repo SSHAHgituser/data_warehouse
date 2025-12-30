@@ -26,8 +26,8 @@ All services are configured in `docker-compose.yml`. Start them with:
 ```
 
 This script will:
-- Start PostgreSQL, Streamlit, and dbt-docs
-- Automatically install AdventureWorks database if it doesn't exist
+- Start PostgreSQL, Streamlit, dbt-docs, and SQL Server
+- Automatically install AdventureWorks database on SQL Server if it doesn't exist
 - Automatically install and start Airbyte if not already installed (takes ~30 minutes on first run)
 
 **To stop all services:**
@@ -44,6 +44,7 @@ docker-compose up -d
 docker-compose up -d postgres      # PostgreSQL database
 docker-compose up -d streamlit     # Streamlit dashboard
 docker-compose up -d dbt-docs      # dbt documentation server
+docker-compose up -d sqlserver     # SQL Server database
 ```
 
 ### Service URLs
@@ -58,6 +59,10 @@ Once started, access the services at:
 
 - **dbt Documentation**: `http://localhost:8080`
 
+- **SQL Server**: `localhost:1433`
+  - Default credentials: `sa/YourStrong@Passw0rd` (or value from `SQLSERVER_SA_PASSWORD` env var)
+  - Default database: `AdventureWorks2022` (after installation)
+  
 - **Airbyte Web UI**: `http://localhost:8000` (see [Airbyte Setup](#airbyte-setup) below)
 
 ### Verify Services are Running
@@ -73,6 +78,7 @@ docker-compose logs -f [service_name]
 docker-compose logs -f postgres
 docker-compose logs -f streamlit
 docker-compose logs -f dbt-docs
+docker-compose logs -f sqlserver
 ```
 
 ## Step-by-Step Setup
@@ -156,7 +162,7 @@ The Airbyte web UI will be available at `http://localhost:8000`.
 
 **Note:** Airbyte requires significant resources (recommended: 8GB+ RAM, 4+ CPUs). See [airbyte/README.md](airbyte/README.md) for detailed setup and troubleshooting.
 
-### 5. (Optional) Install Adventure Works Sample Data
+### 5. (Optional) Install AdventureWorks Sample Data
 
 The `./start.sh` script automatically installs AdventureWorks on SQL Server if it doesn't exist. To install manually:
 
@@ -167,7 +173,7 @@ The `./start.sh` script automatically installs AdventureWorks on SQL Server if i
 This will:
 1. Start SQL Server if not running
 2. Download and restore the AdventureWorks2022 database
-3. Create the `Adventureworks` database
+3. Verify the installation
 
 See [adventureworks/README.md](adventureworks/README.md) for detailed installation instructions.
 
@@ -187,6 +193,10 @@ STREAMLIT_PORT=8501
 
 # dbt Docs
 DBT_DOCS_PORT=8080
+
+# SQL Server
+SQLSERVER_SA_PASSWORD=YourStrong@Passw0rd
+SQLSERVER_PORT=1433
 ```
 
 ## Stopping Services
@@ -218,19 +228,27 @@ abctl local stop
 
 ```
 data_warehouse/
-├── docker-compose.yml          # Core services (postgres, streamlit, dbt-docs)
-├── postgres/                   # PostgreSQL configuration (if any)
+├── docker-compose.yml          # Core services (postgres, streamlit, dbt-docs, sqlserver)
+├── start.sh                    # Startup script for all services
+├── stop.sh                     # Shutdown script for all services
 ├── dbt/                        # dbt project
-│   ├── models/                 # SQL models
+│   ├── models/                 # SQL models (staging, intermediate, marts)
 │   ├── profiles.yml            # Database connection config
+│   ├── run_dbt.sh              # Convenience script for running dbt commands
+│   ├── setup_venv.sh           # Virtual environment setup script
+│   ├── setup_schema.sh         # Database schema setup script
+│   ├── generate_docs.sh        # Documentation generation script
 │   └── README.md               # dbt-specific documentation
 ├── streamlit/                  # Streamlit dashboard
 │   ├── app.py                  # Main dashboard application
+│   ├── pages/                  # Multi-page analytics modules
+│   ├── run.sh                  # Convenience script for local development
+│   ├── requirements.txt        # Python dependencies
 │   └── README.md               # Streamlit-specific documentation
-├── adventureworks/             # Adventure Works installation files
+├── adventureworks/             # AdventureWorks installation files
 │   ├── install_adventureworks_sqlserver.sh  # SQL Server installation script
 │   ├── README_SQLSERVER.md     # SQL Server installation documentation
-│   └── README.md               # Adventure Works documentation
+│   └── README.md               # AdventureWorks documentation
 └── airbyte/                    # Airbyte Core setup
     ├── README.md               # Airbyte setup instructions
     ├── setup_with_abctl.sh     # Official Airbyte setup script
@@ -255,6 +273,7 @@ Each component has its own README with component-specific details:
    lsof -i :5432  # PostgreSQL
    lsof -i :8501  # Streamlit
    lsof -i :8080  # dbt-docs
+   lsof -i :1433  # SQL Server
    ```
 
 2. Check container logs:
