@@ -1,6 +1,11 @@
 # AdventureWorks Sample Database
 
-This directory contains the AdventureWorks sample database installation for PostgreSQL. AdventureWorks is a Microsoft sample database that provides realistic business data for testing and development.
+This directory contains the AdventureWorks sample database installation scripts for both PostgreSQL and SQL Server. AdventureWorks is a Microsoft sample database that provides realistic business data for testing and development.
+
+## Available Installations
+
+- **PostgreSQL**: See this README for PostgreSQL installation
+- **SQL Server**: See [README_SQLSERVER.md](./README_SQLSERVER.md) for SQL Server installation
 
 ## Quick Installation
 
