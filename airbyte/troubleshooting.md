@@ -151,6 +151,193 @@ curl -L -o airbyte-chart.tgz https://airbytehq.github.io/charts/airbyte-2.0.19.t
 
 ---
 
+## Kubernetes API Server Connection Refused
+
+If you encounter errors like:
+```
+ERROR   unable to get the secret airbyte-auth-secrets: Get "https://127.0.0.1:64738/api/v1/namespaces/airbyte-abctl/secrets/airbyte-auth-secrets": dial tcp 127.0.0.1:64738: connect: connection refused
+```
+
+or
+
+```
+ERROR   unable to initialize local command: error communicating with kubernetes: unable to fetch kubernetes server version: Get "https://127.0.0.1:64738/version": dial tcp 127.0.0.1:64738: connect: connection refused
+```
+
+This indicates that the Kubernetes API server inside the kind cluster is not accessible. The container may be running, but the API server hasn't started or is not responding.
+
+### Quick Fixes
+
+#### 1. Restart the Kind Cluster Container
+
+The simplest fix is to restart the kind cluster container:
+
+```bash
+# Stop the container
+docker stop airbyte-abctl-control-plane
+
+# Wait a few seconds
+sleep 5
+
+# Start it again
+docker start airbyte-abctl-control-plane
+
+# Wait for the API server to be ready (30-60 seconds)
+sleep 30
+
+# Check if it's working
+abctl local status
+```
+
+#### 2. Check Container Status
+
+Verify the container is running and healthy:
+
+```bash
+# Check if container is running
+docker ps | grep airbyte-abctl-control-plane
+
+# Check container logs for errors
+docker logs airbyte-abctl-control-plane --tail 100
+
+# Check if the API server is responding (inside the container)
+docker exec airbyte-abctl-control-plane kubectl get nodes
+```
+
+#### 3. Wait for API Server to Start
+
+The Kubernetes API server can take 30-60 seconds to fully start after the container starts. If you just started the container, wait and retry:
+
+```bash
+# Wait 60 seconds
+sleep 60
+
+# Then check status
+abctl local status
+```
+
+#### 4. Restart via abctl (If Available)
+
+If `abctl local stop` works, try restarting:
+
+```bash
+# Try to stop (may fail if cluster is in bad state)
+abctl local stop 2>&1 || true
+
+# Wait a moment
+sleep 5
+
+# Start the container manually
+docker start airbyte-abctl-control-plane
+
+# Wait for API server
+sleep 60
+
+# Check status
+abctl local status
+```
+
+#### 5. Full Reset (If Above Don't Work)
+
+If the cluster is in a bad state, you may need to uninstall and reinstall:
+
+```bash
+# Stop the container
+docker stop airbyte-abctl-control-plane
+
+# Remove the container (this won't delete your Airbyte data)
+docker rm airbyte-abctl-control-plane
+
+# Uninstall Airbyte (preserves data)
+abctl local uninstall
+
+# Reinstall
+abctl local install
+```
+
+**Note:** `abctl local uninstall` preserves your Airbyte data (connections, sources, destinations) but removes the Kubernetes cluster. You'll need to reinstall, but your configurations will remain.
+
+#### 6. Check Docker Resources
+
+Insufficient Docker resources can cause the API server to fail to start:
+
+1. Open **Docker Desktop**
+2. Go to **Settings** → **Resources**
+3. Ensure you have:
+   - **CPUs**: At least 4 CPUs (6-8 recommended)
+   - **Memory**: At least 8GB (12-16GB recommended)
+4. Click **"Apply & Restart"**
+5. Wait for Docker Desktop to fully restart
+6. Restart the kind container:
+   ```bash
+   docker stop airbyte-abctl-control-plane
+   docker start airbyte-abctl-control-plane
+   sleep 60
+   abctl local status
+   ```
+
+#### 7. Check for Port Conflicts
+
+If another process is using the API server port, it can cause issues:
+
+```bash
+# Check what's using the port (replace 64738 with your actual port)
+lsof -i :64738
+
+# If something else is using it, stop that process or change Docker's port allocation
+```
+
+### Step-by-Step Recovery
+
+1. **Stop the container:**
+   ```bash
+   docker stop airbyte-abctl-control-plane
+   ```
+
+2. **Wait 5 seconds:**
+   ```bash
+   sleep 5
+   ```
+
+3. **Start the container:**
+   ```bash
+   docker start airbyte-abctl-control-plane
+   ```
+
+4. **Wait for API server (60 seconds):**
+   ```bash
+   sleep 60
+   ```
+
+5. **Check status:**
+   ```bash
+   abctl local status
+   ```
+
+6. **If still failing, check container logs:**
+   ```bash
+   docker logs airbyte-abctl-control-plane --tail 100
+   ```
+
+7. **If logs show errors, try full reset:**
+   ```bash
+   docker stop airbyte-abctl-control-plane
+   docker rm airbyte-abctl-control-plane
+   abctl local uninstall
+   abctl local install
+   ```
+
+### Prevention
+
+To avoid this issue in the future:
+
+- **Don't force-kill the container** - use `docker stop` instead of `docker kill`
+- **Wait for full startup** - give the container 60 seconds after starting before running `abctl` commands
+- **Ensure sufficient Docker resources** - allocate enough CPU and memory to Docker Desktop
+- **Use `./stop.sh`** - use the provided stop script which handles Airbyte properly
+
+---
+
 ## TLS Handshake Timeout Errors
 
 If you encounter errors like:

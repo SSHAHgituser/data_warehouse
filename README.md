@@ -31,6 +31,7 @@ This script will:
 
 ### 2. Launch Analytics (After Data Ingestion)
 
+Use Airbyte to ingest data from SQLServer AdventureWorks database to PostgresSQL data_warehouse database
 Once data has been ingested into PostgreSQL, run the analytics stack:
 
 ```bash
@@ -38,7 +39,7 @@ Once data has been ingested into PostgreSQL, run the analytics stack:
 ```
 
 This script will:
-- Run dbt models to transform data
+- Run dbt models to transform AdventureWorks data
 - Generate dbt documentation
 - Build and launch Streamlit dashboard
 - Build and launch dbt documentation
