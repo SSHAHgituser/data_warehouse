@@ -7,10 +7,21 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from pages.utils import format_dataframe
 
 def render(conn):
     st.header("💰 Sales & Revenue Analytics")
     st.markdown("Analyze sales performance, revenue trends, and customer value")
+    
+    # Show report date note
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT MAX(order_date) FROM mart_sales")
+            result = cur.fetchone()
+            if result and result[0]:
+                st.info(f"📅 **Report Date:** All analyses are based on data up to {result[0].strftime('%B %d, %Y')} (most recent sales transaction date).")
+    except Exception:
+        pass
     
     # Tabs for different analyses
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
@@ -105,7 +116,7 @@ def render(conn):
                                    labels={'Revenue': 'Revenue ($)', 'Orders': 'Number of Orders'})
                     st.plotly_chart(fig, use_container_width=True)
                 
-                st.dataframe(territory_data, use_container_width=True)
+                st.dataframe(format_dataframe(territory_data), use_container_width=True)
     
     with tab3:
         st.subheader("Product Sales Trends")
@@ -144,7 +155,7 @@ def render(conn):
                 fig.update_layout(yaxis={'categoryorder': 'total ascending'})
                 st.plotly_chart(fig, use_container_width=True)
                 
-                st.dataframe(product_data, use_container_width=True)
+                st.dataframe(format_dataframe(product_data), use_container_width=True)
     
     with tab4:
         st.subheader("Customer Segmentation Analysis")
@@ -158,6 +169,10 @@ def render(conn):
                     AVG(lifetime_value) as avg_clv,
                     AVG(total_orders) as avg_orders
                 FROM mart_customer_analytics
+                WHERE customer_segment IS NOT NULL 
+                    AND customer_status IS NOT NULL
+                    AND customer_segment != ''
+                    AND customer_status != ''
                 GROUP BY customer_segment, customer_status
                 ORDER BY customer_segment, customer_status
             """)
@@ -165,12 +180,23 @@ def render(conn):
                                       columns=['Segment', 'Status', 'Count', 'Avg CLV', 'Avg Orders'])
             
             if not segment_data.empty:
+                # Additional filtering to ensure no empty strings or NaN values
+                segment_data = segment_data[
+                    (segment_data['Segment'].notna()) & 
+                    (segment_data['Status'].notna()) &
+                    (segment_data['Segment'] != '') & 
+                    (segment_data['Status'] != '')
+                ]
+                
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    fig = px.sunburst(segment_data, path=['Segment', 'Status'], values='Count',
-                                    title='Customer Distribution by Segment and Status')
-                    st.plotly_chart(fig, use_container_width=True)
+                    if not segment_data.empty:
+                        fig = px.sunburst(segment_data, path=['Segment', 'Status'], values='Count',
+                                        title='Customer Distribution by Segment and Status')
+                        st.plotly_chart(fig, use_container_width=True)
+                    else:
+                        st.info("No valid data available for sunburst chart")
                 
                 with col2:
                     fig = px.bar(segment_data, x='Segment', y='Avg CLV', color='Status',
@@ -178,28 +204,34 @@ def render(conn):
                                labels={'Avg CLV': 'Average CLV ($)', 'Segment': 'Customer Segment'})
                     st.plotly_chart(fig, use_container_width=True)
                 
-                st.dataframe(segment_data, use_container_width=True)
+                st.dataframe(format_dataframe(segment_data), use_container_width=True)
     
     with tab5:
         st.subheader("Customer Lifetime Value Analysis")
         
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT 
-                    customer_segment,
-                    COUNT(*) as customer_count,
-                    AVG(lifetime_value) as avg_clv,
-                    MIN(lifetime_value) as min_clv,
-                    MAX(lifetime_value) as max_clv,
-                    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY lifetime_value) as median_clv
-                FROM mart_customer_analytics
-                GROUP BY customer_segment
-                ORDER BY avg_clv DESC
-            """)
-            clv_data = pd.DataFrame(cur.fetchall(),
-                                  columns=['Segment', 'Count', 'Avg CLV', 'Min CLV', 'Max CLV', 'Median CLV'])
-            
-            if not clv_data.empty:
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT 
+                        customer_segment,
+                        COUNT(*) as customer_count,
+                        AVG(lifetime_value) as avg_clv,
+                        MIN(lifetime_value) as min_clv,
+                        MAX(lifetime_value) as max_clv,
+                        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY lifetime_value) as median_clv
+                    FROM mart_customer_analytics
+                    WHERE lifetime_value IS NOT NULL
+                    GROUP BY customer_segment
+                    ORDER BY avg_clv DESC
+                """)
+                clv_data = pd.DataFrame(cur.fetchall(),
+                                      columns=['Segment', 'Count', 'Avg CLV', 'Min CLV', 'Max CLV', 'Median CLV'])
+        except Exception as e:
+            conn.rollback()
+            st.error(f"Error loading CLV data: {e}")
+            clv_data = pd.DataFrame()
+        
+        if not clv_data.empty:
                 col1, col2 = st.columns(2)
                 
                 with col1:
@@ -215,24 +247,61 @@ def render(conn):
                     fig.update_layout(title='CLV Distribution', yaxis_title='CLV ($)')
                     st.plotly_chart(fig, use_container_width=True)
                 
-                st.dataframe(clv_data, use_container_width=True)
-                
-                # Top customers
-                st.subheader("Top 20 Customers by Lifetime Value")
+                st.dataframe(format_dataframe(clv_data), use_container_width=True)
+        else:
+            # Diagnostic query to help understand why there's no data
+            try:
                 with conn.cursor() as cur:
                     cur.execute("""
                         SELECT 
-                            customerid,
-                            firstname || ' ' || lastname as customer_name,
-                            lifetime_value,
-                            total_orders,
-                            customer_segment,
-                            customer_status
+                            COUNT(*) as total_customers,
+                            COUNT(CASE WHEN lifetime_value IS NOT NULL THEN 1 END) as has_lifetime_value,
+                            COUNT(CASE WHEN customer_segment IS NOT NULL AND customer_segment != '' THEN 1 END) as has_segment
                         FROM mart_customer_analytics
-                        ORDER BY lifetime_value DESC
-                        LIMIT 20
                     """)
-                    top_customers = pd.DataFrame(cur.fetchall(),
-                                               columns=['Customer ID', 'Name', 'Lifetime Value', 'Orders', 'Segment', 'Status'])
-                    st.dataframe(top_customers, use_container_width=True)
+                    diag = cur.fetchone()
+                    st.warning(f"**Data Availability:** Total customers: {diag[0]}, Has lifetime_value: {diag[1]}, Has segment: {diag[2]}")
+            except Exception as e:
+                st.info("Unable to run diagnostic query")
+        
+        # Top customers (show regardless of CLV data availability)
+        st.subheader("Top 20 Customers by Lifetime Value")
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT 
+                        customerid,
+                        firstname || ' ' || lastname as customer_name,
+                        lifetime_value,
+                        total_orders,
+                        customer_segment,
+                        customer_status
+                    FROM mart_customer_analytics
+                    WHERE lifetime_value IS NOT NULL
+                    ORDER BY lifetime_value DESC
+                    LIMIT 20
+                """)
+                top_customers = pd.DataFrame(cur.fetchall(),
+                                           columns=['Customer ID', 'Name', 'Lifetime Value', 'Orders', 'Segment', 'Status'])
+                if not top_customers.empty:
+                    st.dataframe(format_dataframe(top_customers), use_container_width=True)
+                else:
+                    st.info("No customer data available with lifetime value information")
+                    # Additional diagnostic
+                    try:
+                        with conn.cursor() as cur:
+                            cur.execute("""
+                                SELECT 
+                                    COUNT(*) as total_customers,
+                                    COUNT(CASE WHEN lifetime_value IS NOT NULL THEN 1 END) as has_lifetime_value,
+                                    COUNT(CASE WHEN firstname IS NOT NULL AND lastname IS NOT NULL THEN 1 END) as has_name
+                                FROM mart_customer_analytics
+                            """)
+                            diag = cur.fetchone()
+                            st.warning(f"**Diagnostic:** Total customers: {diag[0]}, Has lifetime_value: {diag[1]}, Has name: {diag[2]}")
+                    except Exception:
+                        pass
+        except Exception as e:
+            conn.rollback()
+            st.error(f"Error loading top customers: {e}")
 
