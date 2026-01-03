@@ -16,11 +16,10 @@ A modern data stack that can be quickly deployed and is ready to scale. This rep
 - Git (for Adventure Works installation)
 - For Airbyte: 8GB+ RAM, 4+ CPUs recommended
 
-### Starting All Services
+### 1. Start All Services
 
-All services are configured in `docker-compose.yml`. Start them with:
+Start all infrastructure services (PostgreSQL, SQL Server, Streamlit, dbt-docs, Airbyte):
 
-**Option 1: Using the startup script (recommended)**
 ```bash
 ./start.sh
 ```
@@ -30,22 +29,30 @@ This script will:
 - Automatically install AdventureWorks database on SQL Server if it doesn't exist
 - Automatically install and start Airbyte if not already installed (takes ~30 minutes on first run)
 
-**To stop all services:**
+### 2. Launch Analytics (After Data Ingestion)
+
+Once data has been ingested into PostgreSQL, run the analytics stack:
+
+```bash
+./launch.sh
+```
+
+This script will:
+- Run dbt models to transform data
+- Generate dbt documentation
+- Build and launch Streamlit dashboard
+- Build and launch dbt documentation
+- Open both applications in your browser
+
+### 3. Stop All Services
+
+Stop all services:
+
 ```bash
 ./stop.sh
 ```
 
-**Option 2: Using Docker Compose directly**
-```bash
-# Start all services
-docker-compose up -d
-
-# Or start services individually
-docker-compose up -d postgres      # PostgreSQL database
-docker-compose up -d streamlit     # Streamlit dashboard
-docker-compose up -d dbt-docs      # dbt documentation server
-docker-compose up -d sqlserver     # SQL Server database
-```
+This will stop all services including Airbyte (if running).
 
 ### Service URLs
 
@@ -81,11 +88,29 @@ docker-compose logs -f dbt-docs
 docker-compose logs -f sqlserver
 ```
 
-## Step-by-Step Setup
+---
+
+## Manual Setup and Configuration
+
+### Starting Services Manually
+
+**Option 1: Using Docker Compose directly**
+```bash
+# Start all services
+docker-compose up -d
+
+# Or start services individually
+docker-compose up -d postgres      # PostgreSQL database
+docker-compose up -d streamlit     # Streamlit dashboard
+docker-compose up -d dbt-docs      # dbt documentation server
+docker-compose up -d sqlserver     # SQL Server database
+```
+
+### Step-by-Step Setup
 
 The `./start.sh` script automates all of this (including Airbyte installation), but here's the manual process:
 
-### 1. Start PostgreSQL
+#### 1. Start PostgreSQL
 
 ```bash
 docker-compose up -d postgres
@@ -109,7 +134,7 @@ docker-compose ps postgres
 docker exec -it data_warehouse_postgres psql -U postgres -d data_warehouse
 ```
 
-### 2. Start Streamlit
+#### 2. Start Streamlit
 
 ```bash
 docker-compose up -d streamlit
@@ -117,7 +142,7 @@ docker-compose up -d streamlit
 
 Access at `http://localhost:8501` (or the port specified in `STREAMLIT_PORT`).
 
-### 3. Start dbt Documentation Server
+#### 3. Start dbt Documentation Server
 
 ```bash
 docker-compose up -d dbt-docs
@@ -127,7 +152,7 @@ Access at `http://localhost:8080` (or the port specified in `DBT_DOCS_PORT`).
 
 **Note:** The dbt-docs service automatically generates documentation on startup.
 
-### 4. Airbyte Setup
+#### 4. Airbyte Setup
 
 Airbyte is **not** included in `docker-compose.yml` because:
 
@@ -162,7 +187,7 @@ The Airbyte web UI will be available at `http://localhost:8000`.
 
 **Note:** Airbyte requires significant resources (recommended: 8GB+ RAM, 4+ CPUs). See [airbyte/README.md](airbyte/README.md) for detailed setup and troubleshooting.
 
-### 5. (Optional) Install AdventureWorks Sample Data
+#### 5. (Optional) Install AdventureWorks Sample Data
 
 The `./start.sh` script automatically installs AdventureWorks on SQL Server if it doesn't exist. To install manually:
 
@@ -177,7 +202,7 @@ This will:
 
 See [adventureworks/README.md](adventureworks/README.md) for detailed installation instructions.
 
-## Environment Variables
+### Environment Variables
 
 You can customize the configuration using environment variables or a `.env` file:
 
@@ -199,7 +224,7 @@ SQLSERVER_SA_PASSWORD=YourStrong@Passw0rd
 SQLSERVER_PORT=1433
 ```
 
-## Stopping Services
+### Stopping Services Manually
 
 **Option 1: Using the stop script (recommended)**
 ```bash
@@ -230,6 +255,7 @@ abctl local stop
 data_warehouse/
 ├── docker-compose.yml          # Core services (postgres, streamlit, dbt-docs, sqlserver)
 ├── start.sh                    # Startup script for all services
+├── launch.sh                   # Launch analytics stack (dbt, docs, streamlit)
 ├── stop.sh                     # Shutdown script for all services
 ├── dbt/                        # dbt project
 │   ├── models/                 # SQL models (staging, intermediate, marts)
