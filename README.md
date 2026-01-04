@@ -32,7 +32,7 @@ This script will:
 ### 2. Launch Analytics (After Data Ingestion)
 
 Use Airbyte to ingest data from SQLServer AdventureWorks database to PostgresSQL data_warehouse database.
-Remember to bring schema from source to data_warehouse database to match with dbt source.
+Remember to bring schema.table from source to data_warehouse database to match with dbt source.
 Once data has been ingested into PostgreSQL, run the analytics stack:
 
 ```bash
