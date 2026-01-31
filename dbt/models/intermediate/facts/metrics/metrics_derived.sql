@@ -3,19 +3,19 @@
 {#
     Derived/Strategic Metrics
     =========================
-    Calculates higher-level metrics (L3-L5) by aggregating from operational data.
-    These metrics complete the metrics hierarchy from operational to KPIs.
+    Calculates higher-level metrics (L3-L5) by aggregating from individual metrics tables.
+    This ensures consistency - derived metrics use the same source as operational metrics.
     
     Metrics included:
-    - TOTAL_REVENUE: Sum of all sales order revenue
-    - GROSS_PROFIT: Sum of all line item profits
-    - GROSS_MARGIN: Gross profit as % of revenue
-    - INVENTORY_TURNOVER: Estimated inventory turns
-    - CUSTOMER_SATISFACTION: Composite delivery score
-    - PRODUCTION_EFFICIENCY: Production cost efficiency
-    - SUPPLIER_QUALITY: Average supplier rejection rate (inverted)
-    - SUPPLIER_RELIABILITY: Average supplier fulfillment rate
-    - SALES_PERFORMANCE: Average quota achievement across team
+    - TOTAL_REVENUE: Sum of SO_REVENUE from metrics_sales_order
+    - GROSS_PROFIT: Sum of SOL_PROFIT from metrics_sales_line
+    - GROSS_MARGIN: GROSS_PROFIT / TOTAL_REVENUE * 100
+    - INVENTORY_TURNOVER: Estimated from inventory and purchase metrics
+    - CUSTOMER_SATISFACTION: Based on SO_DAYS_TO_SHIP
+    - PRODUCTION_EFFICIENCY: Based on WO_COST_VARIANCE_PCT
+    - SUPPLIER_QUALITY: Based on PO_REJECTION_RATE
+    - SUPPLIER_RELIABILITY: Based on PO_FULFILLMENT_RATE
+    - SALES_PERFORMANCE: Based on EQ_ACHIEVEMENT_PCT
     
     Granularity: One row per metric (company-wide aggregates)
     
@@ -23,64 +23,56 @@
 #}
 
 with report_date_calc as (
-    select max(orderdate)::date as report_date
-    from {{ ref('stg_salesorderheader') }}
+    select max(report_date) as report_date
+    from {{ ref('metrics_sales_order') }}
 ),
 
--- Aggregate sales order data
-sales_aggregates as (
+-- Aggregate from metrics_sales_order
+sales_order_agg as (
     select
-        sum(totaldue) as total_revenue,
-        sum(subtotal) as total_subtotal,
-        avg(coalesce(days_to_ship, 0)) as avg_days_to_ship,
-        count(*) as order_count
-    from {{ ref('fact_sales_order') }}
+        sum(case when metric_key = 'SO_REVENUE' then metric_value else 0 end) as total_revenue,
+        avg(case when metric_key = 'SO_DAYS_TO_SHIP' then metric_value end) as avg_days_to_ship
+    from {{ ref('metrics_sales_order') }}
 ),
 
--- Aggregate sales line data
-sales_line_aggregates as (
+-- Aggregate from metrics_sales_line
+sales_line_agg as (
     select
-        sum(coalesce(total_profit, 0)) as gross_profit,
-        sum(net_line_amount) as total_line_revenue
-    from {{ ref('fact_sales_order_line') }}
+        sum(case when metric_key = 'SOL_PROFIT' then metric_value else 0 end) as gross_profit,
+        sum(case when metric_key = 'SOL_REVENUE' then metric_value else 0 end) as total_line_revenue
+    from {{ ref('metrics_sales_line') }}
 ),
 
--- Aggregate inventory data
-inventory_aggregates as (
+-- Aggregate from metrics_inventory
+inventory_agg as (
     select
-        sum(quantity) as total_inventory_qty,
-        sum(coalesce(inventory_value, 0)) as total_inventory_value,
-        avg(coalesce(inventory_value, 0)) as avg_inventory_value
-    from {{ ref('fact_inventory') }}
+        sum(case when metric_key = 'INV_VALUE' then metric_value else 0 end) as total_inventory_value,
+        avg(case when metric_key = 'INV_VALUE' then metric_value end) as avg_inventory_value
+    from {{ ref('metrics_inventory') }}
 ),
 
--- Aggregate purchase order data
-purchase_aggregates as (
+-- Aggregate from metrics_purchase_order
+purchase_agg as (
     select
-        avg(coalesce(rejection_rate_percent, 0)) as avg_rejection_rate,
-        avg(coalesce(fulfillment_rate_percent, 0)) as avg_fulfillment_rate,
-        sum(totaldue) as total_purchase_amount
-    from {{ ref('fact_purchase_order') }}
+        avg(case when metric_key = 'PO_REJECTION_RATE' then metric_value end) as avg_rejection_rate,
+        avg(case when metric_key = 'PO_FULFILLMENT_RATE' then metric_value end) as avg_fulfillment_rate,
+        sum(case when metric_key = 'PO_AMOUNT' then metric_value else 0 end) as total_purchase_amount
+    from {{ ref('metrics_purchase_order') }}
 ),
 
--- Aggregate work order data
-work_order_aggregates as (
+-- Aggregate from metrics_work_order
+work_order_agg as (
     select
-        sum(coalesce(total_planned_cost, 0)) as total_planned_cost,
-        sum(coalesce(total_actual_cost, 0)) as total_actual_cost,
-        avg(coalesce(cost_variance_percent, 0)) as avg_cost_variance_pct,
-        avg(coalesce(scrap_rate_percent, 0)) as avg_scrap_rate
-    from {{ ref('fact_work_order') }}
+        avg(case when metric_key = 'WO_COST_VARIANCE_PCT' then metric_value end) as avg_cost_variance_pct,
+        avg(case when metric_key = 'WO_SCRAP_RATE' then metric_value end) as avg_scrap_rate
+    from {{ ref('metrics_work_order') }}
 ),
 
--- Aggregate employee quota data
-quota_aggregates as (
+-- Aggregate from metrics_employee_quota
+quota_agg as (
     select
-        avg(coalesce(quota_achievement_percent, 0)) as avg_quota_achievement,
-        sum(salesquota) as total_quota,
-        sum(coalesce(salesytd, 0)) as total_sales_ytd,
-        count(*) as employee_count
-    from {{ ref('fact_employee_quota') }}
+        avg(case when metric_key = 'EQ_ACHIEVEMENT_PCT' then metric_value end) as avg_quota_achievement
+    from {{ ref('metrics_employee_quota') }}
 ),
 
 -- Calculate derived metrics
@@ -88,53 +80,52 @@ derived_metrics as (
     select
         (select report_date from report_date_calc) as report_date,
         
-        -- TOTAL_REVENUE: Sum of all sales
-        sa.total_revenue,
+        -- TOTAL_REVENUE: Sum of SO_REVENUE
+        soa.total_revenue,
         
-        -- GROSS_PROFIT: Sum of line item profits
+        -- GROSS_PROFIT: Sum of SOL_PROFIT
         sla.gross_profit,
         
         -- GROSS_MARGIN: Profit / Revenue * 100
         case 
-            when sa.total_revenue > 0 
-            then (sla.gross_profit / sa.total_revenue) * 100 
+            when soa.total_revenue > 0 
+            then (sla.gross_profit / soa.total_revenue) * 100 
             else 0 
         end as gross_margin,
         
-        -- INVENTORY_TURNOVER: Approximation using total purchases / avg inventory
+        -- INVENTORY_TURNOVER: Total purchases / avg inventory value
         case 
             when ia.avg_inventory_value > 0 
             then pa.total_purchase_amount / ia.avg_inventory_value 
             else 0 
         end as inventory_turnover,
         
-        -- CUSTOMER_SATISFACTION: Composite score (100 - normalized days to ship penalty)
-        -- Lower days to ship = higher satisfaction
+        -- CUSTOMER_SATISFACTION: Score based on avg days to ship
         case 
-            when sa.avg_days_to_ship <= 3 then 90
-            when sa.avg_days_to_ship <= 5 then 75
-            when sa.avg_days_to_ship <= 7 then 60
+            when soa.avg_days_to_ship <= 3 then 90
+            when soa.avg_days_to_ship <= 5 then 75
+            when soa.avg_days_to_ship <= 7 then 60
             else 50
         end as customer_satisfaction_score,
         
-        -- PRODUCTION_EFFICIENCY: 100 - avg cost variance (capped)
-        greatest(0, 100 - abs(woa.avg_cost_variance_pct)) as production_efficiency,
+        -- PRODUCTION_EFFICIENCY: 100 - avg cost variance %
+        greatest(0, 100 - abs(coalesce(woa.avg_cost_variance_pct, 0))) as production_efficiency,
         
-        -- SUPPLIER_QUALITY: 100 - rejection rate
-        100 - pa.avg_rejection_rate as supplier_quality,
+        -- SUPPLIER_QUALITY: 100 - avg rejection rate
+        100 - coalesce(pa.avg_rejection_rate, 0) as supplier_quality,
         
-        -- SUPPLIER_RELIABILITY: Direct fulfillment rate
-        pa.avg_fulfillment_rate as supplier_reliability,
+        -- SUPPLIER_RELIABILITY: Direct from avg fulfillment rate
+        coalesce(pa.avg_fulfillment_rate, 0) as supplier_reliability,
         
-        -- SALES_PERFORMANCE: Average quota achievement
-        qa.avg_quota_achievement as sales_performance
+        -- SALES_PERFORMANCE: Avg quota achievement
+        coalesce(qa.avg_quota_achievement, 0) as sales_performance
         
-    from sales_aggregates sa
-    cross join sales_line_aggregates sla
-    cross join inventory_aggregates ia
-    cross join purchase_aggregates pa
-    cross join work_order_aggregates woa
-    cross join quota_aggregates qa
+    from sales_order_agg soa
+    cross join sales_line_agg sla
+    cross join inventory_agg ia
+    cross join purchase_agg pa
+    cross join work_order_agg woa
+    cross join quota_agg qa
 )
 
 -- Unpivot to tall format
