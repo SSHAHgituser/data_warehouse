@@ -12,6 +12,8 @@
     - EQ_ACHIEVEMENT_PCT: Quota achievement percentage
     - EQ_QUOTA_VARIANCE: Variance from quota
     - EQ_BONUS: Employee bonus amount
+    
+    Relevant dimensions: employee, territory, quota_status
 #}
 
 with report_date_calc as (
@@ -23,17 +25,19 @@ select
     quota_date_key as date_key,
     (select report_date from report_date_calc) as report_date,
     'employee_quota' as source_table,
-    cast(null as bigint) as customer_key,
-    cast(null as bigint) as product_key,
+    employee_key as source_record_id,
+    
+    -- Core dimension keys
     employee_key,
     territory_key,
-    cast(null as bigint) as vendor_key,
-    cast(null as bigint) as location_key,
-    employee_key as source_record_id,
-    jsonb_build_object(
-        'quota_status', quota_status,
-        'commission_pct', commissionpct
-    ) as additional_dimensions,
+    
+    -- Relevant status columns
+    quota_status,
+    
+    -- Relevant context columns
+    commissionpct as commission_pct,
+    
+    -- Metric columns
     metric_key,
     metric_name,
     metric_category,

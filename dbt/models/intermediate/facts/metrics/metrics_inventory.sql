@@ -10,6 +10,8 @@
     - INV_VALUE: Inventory value (quantity * cost)
     - INV_ABOVE_SAFETY: Quantity above safety stock level
     - INV_REORDER_PCT: Percentage of reorder point
+    
+    Relevant dimensions: product, location, inventory_status
 #}
 
 with report_date_calc as (
@@ -18,24 +20,24 @@ with report_date_calc as (
 )
 
 select
-    -- Inventory doesn't have a natural date, use report date
     cast(to_char((select report_date from report_date_calc), 'YYYYMMDD') as integer) as date_key,
     (select report_date from report_date_calc) as report_date,
     'inventory' as source_table,
-    cast(null as bigint) as customer_key,
-    product_key,
-    cast(null as bigint) as employee_key,
-    cast(null as bigint) as territory_key,
-    cast(null as bigint) as vendor_key,
-    location_key,
-    -- Create a composite source record id
     row_number() over (order by product_key, location_key) as source_record_id,
-    jsonb_build_object(
-        'location_name', location_name,
-        'inventory_status', inventory_status,
-        'safety_stock_level', safetystocklevel,
-        'reorder_point', reorderpoint
-    ) as additional_dimensions,
+    
+    -- Core dimension keys
+    product_key,
+    location_key,
+    
+    -- Relevant status columns
+    inventory_status,
+    location_name,
+    
+    -- Relevant context columns
+    safetystocklevel as safety_stock_level,
+    reorderpoint as reorder_point,
+    
+    -- Metric columns
     metric_key,
     metric_name,
     metric_category,

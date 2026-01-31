@@ -4,8 +4,9 @@ models:
   # ============================================
   # METRICS BUILDING BLOCKS
   # ============================================
-  # These models extract metrics from fact tables in a standardized format.
-  # They are combined in fact_global_metrics for unified analytics.
+  # These models extract metrics from fact tables in a lean format.
+  # Each model only includes columns relevant to its metrics.
+  # fact_global_metrics handles column alignment and 'All' defaults.
   
   - name: metrics_sales_order
     description: |
@@ -17,14 +18,20 @@ models:
     columns:
       - name: date_key
         description: "Order date key (YYYYMMDD format)"
-      - name: metric_key
-        description: "Unique metric identifier"
-      - name: metric_value
-        description: "The metric value"
       - name: customer_key
         description: "Foreign key to dim_customer"
+      - name: employee_key
+        description: "Foreign key to dim_employee"
       - name: territory_key
         description: "Foreign key to dim_territory"
+      - name: ship_method_key
+        description: "Foreign key to ship method"
+      - name: credit_card_key
+        description: "Foreign key to credit card"
+      - name: online_order_flag
+        description: "'Online' or 'In-Store'"
+      - name: order_status
+        description: "Order status code"
 
   - name: metrics_sales_line
     description: |
@@ -36,14 +43,20 @@ models:
     columns:
       - name: date_key
         description: "Order date key (YYYYMMDD format)"
-      - name: metric_key
-        description: "Unique metric identifier"
-      - name: metric_value
-        description: "The metric value"
       - name: customer_key
         description: "Foreign key to dim_customer"
       - name: product_key
         description: "Foreign key to dim_product"
+      - name: employee_key
+        description: "Foreign key to dim_employee"
+      - name: territory_key
+        description: "Foreign key to dim_territory"
+      - name: special_offer_key
+        description: "Foreign key to special offer"
+      - name: parent_order_id
+        description: "Reference to parent sales order"
+      - name: has_discount
+        description: "'Yes' or 'No'"
 
   - name: metrics_inventory
     description: |
@@ -54,14 +67,18 @@ models:
     columns:
       - name: date_key
         description: "Report date key (snapshot date)"
-      - name: metric_key
-        description: "Unique metric identifier"
-      - name: metric_value
-        description: "The metric value"
       - name: product_key
         description: "Foreign key to dim_product"
       - name: location_key
         description: "Location identifier"
+      - name: inventory_status
+        description: "'In Stock', 'Out of Stock', 'Below Safety Stock', 'At Reorder Point'"
+      - name: location_name
+        description: "Name of the inventory location"
+      - name: safety_stock_level
+        description: "Safety stock level threshold"
+      - name: reorder_point
+        description: "Reorder point threshold"
 
   - name: metrics_purchase_order
     description: |
@@ -74,14 +91,14 @@ models:
     columns:
       - name: date_key
         description: "Order date key (YYYYMMDD format)"
-      - name: metric_key
-        description: "Unique metric identifier"
-      - name: metric_value
-        description: "The metric value"
       - name: vendor_key
         description: "Foreign key to dim_vendor"
       - name: employee_key
         description: "Foreign key to dim_employee"
+      - name: ship_method_key
+        description: "Foreign key to ship method"
+      - name: order_status
+        description: "Purchase order status code"
 
   - name: metrics_work_order
     description: |
@@ -95,12 +112,16 @@ models:
     columns:
       - name: date_key
         description: "Start date key (YYYYMMDD format)"
-      - name: metric_key
-        description: "Unique metric identifier"
-      - name: metric_value
-        description: "The metric value"
       - name: product_key
         description: "Foreign key to dim_product"
+      - name: scrap_reason_key
+        description: "Foreign key to scrap reason"
+      - name: delivery_status
+        description: "'On Time', 'Slightly Late', 'Late'"
+      - name: scrap_reason_name
+        description: "Scrap reason or 'None'"
+      - name: number_of_operations
+        description: "Number of routing operations"
 
   - name: metrics_employee_quota
     description: |
@@ -112,11 +133,11 @@ models:
     columns:
       - name: date_key
         description: "Quota date key (YYYYMMDD format)"
-      - name: metric_key
-        description: "Unique metric identifier"
-      - name: metric_value
-        description: "The metric value"
       - name: employee_key
         description: "Foreign key to dim_employee"
       - name: territory_key
         description: "Foreign key to dim_territory"
+      - name: quota_status
+        description: "'Achieved', 'Near Target', 'Below Target'"
+      - name: commission_pct
+        description: "Commission percentage for the employee"

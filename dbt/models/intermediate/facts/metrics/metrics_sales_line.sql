@@ -13,6 +13,8 @@
     - SOL_PROFIT_MARGIN: Profit margin percentage
     - SOL_DISCOUNT: Discount amount
     - SOL_UNIT_PRICE: Unit price
+    
+    Relevant dimensions: customer, product, employee, territory, special_offer, has_discount
 #}
 
 with report_date_calc as (
@@ -24,18 +26,22 @@ select
     order_date_key as date_key,
     (select report_date from report_date_calc) as report_date,
     'sales_order_line' as source_table,
+    salesorderdetailid as source_record_id,
+    
+    -- Core dimension keys
     customer_key,
     product_key,
     employee_key,
     territory_key,
-    cast(null as bigint) as vendor_key,
-    cast(null as bigint) as location_key,
-    salesorderdetailid as source_record_id,
-    jsonb_build_object(
-        'sales_order_id', salesorderid,
-        'special_offer_key', special_offer_key,
-        'has_discount', has_discount
-    ) as additional_dimensions,
+    
+    -- Relevant dimension keys for this metric
+    special_offer_key,
+    salesorderid as parent_order_id,
+    
+    -- Relevant status columns
+    case when has_discount then 'Yes' else 'No' end as has_discount,
+    
+    -- Metric columns
     metric_key,
     metric_name,
     metric_category,

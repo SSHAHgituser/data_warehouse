@@ -16,6 +16,8 @@
     - PO_REJECTION_RATE: Rejection rate percentage
     - PO_FULFILLMENT_RATE: Fulfillment rate percentage
     - PO_DAYS_TO_SHIP: Days from order to ship
+    
+    Relevant dimensions: vendor, employee, ship_method, order_status
 #}
 
 with report_date_calc as (
@@ -27,17 +29,19 @@ select
     order_date_key as date_key,
     (select report_date from report_date_calc) as report_date,
     'purchase_order' as source_table,
-    cast(null as bigint) as customer_key,
-    cast(null as bigint) as product_key,
-    employee_key,
-    cast(null as bigint) as territory_key,
-    vendor_key,
-    cast(null as bigint) as location_key,
     purchaseorderid as source_record_id,
-    jsonb_build_object(
-        'ship_method_key', ship_method_key,
-        'status', status
-    ) as additional_dimensions,
+    
+    -- Core dimension keys
+    vendor_key,
+    employee_key,
+    
+    -- Relevant dimension keys for this metric
+    ship_method_key,
+    
+    -- Relevant status columns
+    status::text as order_status,
+    
+    -- Metric columns
     metric_key,
     metric_name,
     metric_category,

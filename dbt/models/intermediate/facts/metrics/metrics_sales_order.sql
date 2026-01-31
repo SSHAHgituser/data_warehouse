@@ -14,6 +14,8 @@
     - SO_LINE_ITEMS: Number of line items
     - SO_DISCOUNT: Total discount amount
     - SO_DAYS_TO_SHIP: Days from order to ship
+    
+    Relevant dimensions: customer, employee, territory, ship_method, credit_card, online_order_flag, order_status
 #}
 
 with report_date_calc as (
@@ -25,18 +27,22 @@ select
     order_date_key as date_key,
     (select report_date from report_date_calc) as report_date,
     'sales_order' as source_table,
+    salesorderid as source_record_id,
+    
+    -- Core dimension keys
     customer_key,
-    cast(null as bigint) as product_key,
     employee_key,
     territory_key,
-    cast(null as bigint) as vendor_key,
-    cast(null as bigint) as location_key,
-    salesorderid as source_record_id,
-    jsonb_build_object(
-        'ship_method_key', ship_method_key,
-        'credit_card_key', credit_card_key,
-        'online_order', onlineorderflag
-    ) as additional_dimensions,
+    
+    -- Relevant dimension keys for this metric
+    ship_method_key,
+    credit_card_key,
+    
+    -- Relevant status columns
+    case when onlineorderflag::text = 'true' then 'Online' else 'In-Store' end as online_order_flag,
+    status::text as order_status,
+    
+    -- Metric columns
     metric_key,
     metric_name,
     metric_category,

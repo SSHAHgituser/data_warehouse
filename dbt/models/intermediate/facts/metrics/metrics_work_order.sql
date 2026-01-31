@@ -17,6 +17,8 @@
     - WO_PRODUCTION_DAYS: Days to complete production
     - WO_ACTUAL_HOURS: Actual production hours
     - WO_HOURS_PER_UNIT: Hours per unit produced
+    
+    Relevant dimensions: product, scrap_reason, delivery_status
 #}
 
 with report_date_calc as (
@@ -28,19 +30,22 @@ select
     start_date_key as date_key,
     (select report_date from report_date_calc) as report_date,
     'work_order' as source_table,
-    cast(null as bigint) as customer_key,
-    product_key,
-    cast(null as bigint) as employee_key,
-    cast(null as bigint) as territory_key,
-    cast(null as bigint) as vendor_key,
-    cast(null as bigint) as location_key,
     workorderid as source_record_id,
-    jsonb_build_object(
-        'scrap_reason_key', scrap_reason_key,
-        'scrap_reason_name', scrap_reason_name,
-        'delivery_status', delivery_status,
-        'number_of_operations', number_of_operations
-    ) as additional_dimensions,
+    
+    -- Core dimension keys
+    product_key,
+    
+    -- Relevant dimension keys for this metric
+    scrap_reason_key,
+    
+    -- Relevant status columns
+    delivery_status,
+    coalesce(scrap_reason_name, 'None') as scrap_reason_name,
+    
+    -- Relevant context columns
+    number_of_operations,
+    
+    -- Metric columns
     metric_key,
     metric_name,
     metric_category,

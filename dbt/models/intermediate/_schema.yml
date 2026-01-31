@@ -90,6 +90,45 @@ models:
       - name: vendor_status
         description: "Vendor status (Active/Inactive)"
 
+  - name: dim_metric
+    description: |
+      Metrics catalog dimension table documenting all metrics in fact_global_metrics.
+      Provides business definitions, targets, alerts, and ownership information.
+      
+      Use cases:
+      - Self-service analytics with clear metric definitions
+      - Metrics governance and accountability
+      - Automated alerting and monitoring
+      - Impact analysis via reference_metrics
+      - Data literacy and onboarding
+    columns:
+      - name: metric_id
+        description: "Surrogate key for the metric"
+      - name: metric_key
+        description: "Unique metric identifier matching fact_global_metrics.metric_key"
+      - name: metric_name
+        description: "Human-readable metric name"
+      - name: metric_category
+        description: "Category: Sales, Inventory, Procurement, Production, HR"
+      - name: metric_description
+        description: "Detailed business definition and meaning of the metric"
+      - name: metric_target
+        description: "Target/goal for the metric (e.g., '>= 25%', 'YoY growth >= 10%')"
+      - name: alert_criteria
+        description: "Conditions that should trigger alerts (e.g., 'ALERT if: value < threshold')"
+      - name: recommended_actions
+        description: "Suggested follow-up actions based on metric values"
+      - name: reference_metrics
+        description: "Related metrics to track for impact analysis (comma-separated)"
+      - name: owner_name
+        description: "Name of the metric owner/steward"
+      - name: owner_email
+        description: "Email of the metric owner/steward"
+      - name: created_at
+        description: "Timestamp when the record was created"
+      - name: updated_at
+        description: "Timestamp when the record was last updated"
+
   # Fact Tables
   - name: fact_sales_order
     description: "Sales order fact table - one row per order"
@@ -196,6 +235,9 @@ models:
       - Consistent metric definitions
       - Dynamic dashboards and reporting
       
+      Dimension columns use 'All' as default value when not applicable to a metric.
+      This enables easy filtering without NULL handling.
+      
       Source tables: fact_sales_order, fact_sales_order_line, fact_inventory, 
                      fact_purchase_order, fact_work_order, fact_employee_quota
     columns:
@@ -215,6 +257,7 @@ models:
         description: "Source fact table name"
       - name: source_record_id
         description: "Original record ID from source table"
+      # Core dimension keys
       - name: customer_key
         description: "Foreign key to dim_customer (nullable)"
       - name: product_key
@@ -227,8 +270,44 @@ models:
         description: "Foreign key to dim_vendor (nullable)"
       - name: location_key
         description: "Foreign key to location (nullable)"
-      - name: additional_dimensions
-        description: "JSONB column with metric-specific additional dimensions"
+      # Additional dimension keys
+      - name: ship_method_key
+        description: "Foreign key to ship method (nullable)"
+      - name: credit_card_key
+        description: "Foreign key to credit card (nullable)"
+      - name: special_offer_key
+        description: "Foreign key to special offer (nullable)"
+      - name: scrap_reason_key
+        description: "Foreign key to scrap reason (nullable)"
+      - name: parent_order_id
+        description: "Reference to parent order ID (nullable)"
+      # Status dimension columns (text, 'All' = not applicable)
+      - name: online_order_flag
+        description: "Order channel: 'Online', 'In-Store', or 'All' if not applicable"
+      - name: has_discount
+        description: "Discount applied: 'Yes', 'No', or 'All' if not applicable"
+      - name: inventory_status
+        description: "Inventory status: 'In Stock', 'Out of Stock', etc., or 'All'"
+      - name: order_status
+        description: "Order status code or 'All' if not applicable"
+      - name: delivery_status
+        description: "Delivery status: 'On Time', 'Late', etc., or 'All'"
+      - name: quota_status
+        description: "Quota status: 'Achieved', 'Near Target', etc., or 'All'"
+      # Context columns
+      - name: location_name
+        description: "Location name or 'All' if not applicable"
+      - name: scrap_reason_name
+        description: "Scrap reason name, 'None', or 'All'"
+      - name: safety_stock_level
+        description: "Safety stock level (numeric, null if N/A)"
+      - name: reorder_point
+        description: "Reorder point (numeric, null if N/A)"
+      - name: number_of_operations
+        description: "Number of operations (numeric, null if N/A)"
+      - name: commission_pct
+        description: "Commission percentage (numeric, null if N/A)"
+      # Metric value
       - name: metric_value
         description: "The numeric metric value"
       - name: metric_unit
