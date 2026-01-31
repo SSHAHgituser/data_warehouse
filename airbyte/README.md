@@ -13,7 +13,7 @@ Airbyte deprecated Docker Compose in version 1.0 (September 2024). `abctl` is th
 - **Automatic management**: Handles Kubernetes, Helm charts, and image pulling automatically
 - **Better experience**: One command setup vs. manual image building
 
-See the [main README](../README.md#why-airbyte-is-not-in-docker-compose) for detailed explanation.
+See the [main README](../README.md#4-airbyte-setup) for detailed explanation.
 
 ## Quick Setup
 

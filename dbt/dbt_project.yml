@@ -21,10 +21,6 @@ clean-targets:         # directories to be removed by `dbt clean`
 # Configuring models
 models:
   data_warehouse:
-    # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
-    
     # Staging models - views for raw data
     staging:
       +materialized: view

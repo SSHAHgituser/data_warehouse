@@ -281,8 +281,7 @@ data_warehouse/
 │   └── README.md               # Streamlit-specific documentation
 ├── adventureworks/             # AdventureWorks installation files
 │   ├── install_adventureworks_sqlserver.sh  # SQL Server installation script
-│   ├── README_SQLSERVER.md     # SQL Server installation documentation
-│   └── README.md               # AdventureWorks documentation
+│   └── README.md               # AdventureWorks and SQL Server installation documentation
 └── airbyte/                    # Airbyte Core setup
     ├── README.md               # Airbyte setup instructions
     ├── setup_with_abctl.sh     # Official Airbyte setup script
