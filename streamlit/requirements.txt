@@ -6,3 +6,6 @@ plotly>=5.0.0
 folium>=0.14.0
 streamlit-folium>=0.15.0
 
+# AI Dependencies
+openai>=1.0.0
+anthropic>=0.18.0

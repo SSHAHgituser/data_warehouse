@@ -174,6 +174,7 @@ page = st.sidebar.radio(
     "Select Analytics Category",
     [
         "🏠 Overview",
+        "🤖 AI Assistant",
         "💰 Sales & Revenue",
         "📦 Product & Inventory",
         "👥 Customer Analytics",
@@ -427,6 +428,9 @@ if page == "🏠 Overview":
         st.error(f"Error loading country revenue map: {e}")
 
 # Import and route to other pages
+elif page == "🤖 AI Assistant":
+    from pages import ai_assistant
+    ai_assistant.render(conn)
 elif page == "💰 Sales & Revenue":
     from pages import sales_revenue
     sales_revenue.render(conn)
