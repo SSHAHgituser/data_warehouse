@@ -152,6 +152,30 @@ OPENAI_API_KEY=sk-proj-your-key
 OPENAI_MODEL=gpt-4o-mini  # ~$0.0004 per query
 ```
 
+## AI Sync with dbt Models
+
+The AI Assistant automatically stays in sync with dbt models. When you run `dbt run` or `dbt build`, the following files are auto-generated:
+
+| File | Purpose |
+|------|---------|
+| `ai/allowed_tables.json` | Whitelist of tables the AI can query |
+| `../dbt/models/schema_ai.md` | Optimized schema context for LLM |
+
+**This means:**
+- ✅ New marts/dims/facts are automatically available to the AI
+- ✅ No manual editing of hardcoded table lists
+- ✅ Schema changes are reflected in AI prompts
+
+```bash
+# Add a new model to dbt
+cd ../dbt
+./run_dbt.sh run  # Auto-syncs AI components
+
+# Restart Streamlit to pick up changes
+cd ../streamlit
+./run.sh
+```
+
 ## Adding Dependencies
 
 1. Install in virtual environment:

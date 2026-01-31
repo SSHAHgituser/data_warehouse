@@ -23,11 +23,15 @@ export DBT_PROFILES_DIR="$SCRIPT_DIR"
 # Run dbt with all passed arguments
 dbt "$@"
 
-# After successful dbt run/build, regenerate AI schema
-# This keeps the AI context in sync with your dbt models
+# After successful dbt run/build, regenerate AI schema and sync components
+# This keeps all AI components in sync with your dbt models:
+#   1. schema_ai.md - Optimized LLM context for SQL generation
+#   2. allowed_tables.json - Whitelist for SQL validator security
 if [[ "$1" == "run" || "$1" == "build" ]]; then
     echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🔄 Syncing AI components with dbt models..."
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     python scripts/generate_ai_schema.py
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 fi

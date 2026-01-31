@@ -2,8 +2,9 @@
 """
 Generate AI Schema File
 =======================
-Reads all dbt _schema.yml files and generates an optimized schema_ai.md
-file for the AI Analytics Assistant.
+Reads all dbt _schema.yml files and generates:
+1. schema_ai.md - Optimized schema context for LLM prompting
+2. allowed_tables.json - Whitelist for SQL validator
 
 This script is automatically run after `dbt run` to keep the AI context
 in sync with your dbt models.
@@ -13,10 +14,12 @@ Usage:
 
 Output:
     models/schema_ai.md
+    ../streamlit/ai/allowed_tables.json
 """
 
 import os
 import sys
+import json
 from pathlib import Path
 from datetime import datetime
 
@@ -76,10 +79,59 @@ def load_all_schemas(models_path: Path) -> dict:
                 if model_name:
                     schemas[model_name] = {
                         'description': model.get('description', ''),
-                        'columns': model.get('columns', [])
+                        'columns': model.get('columns', []),
+                        'source_file': str(schema_file)
                     }
     
     return schemas
+
+
+def categorize_tables(schemas: dict) -> dict:
+    """
+    Auto-categorize tables into marts, dimensions, and facts based on naming convention.
+    
+    Returns dict with keys: 'marts', 'dimensions', 'facts', 'metrics', 'staging', 'other'
+    """
+    categories = {
+        'marts': [],
+        'dimensions': [],
+        'facts': [],
+        'metrics': [],
+        'staging': [],
+        'other': []
+    }
+    
+    for table_name in schemas.keys():
+        name_lower = table_name.lower()
+        
+        if name_lower.startswith('mart_'):
+            categories['marts'].append(table_name)
+        elif name_lower.startswith('dim_'):
+            categories['dimensions'].append(table_name)
+        elif name_lower.startswith('fact_'):
+            categories['facts'].append(table_name)
+        elif name_lower.startswith('metrics_'):
+            categories['metrics'].append(table_name)
+        elif name_lower.startswith('stg_'):
+            categories['staging'].append(table_name)
+        else:
+            categories['other'].append(table_name)
+    
+    # Sort each category
+    for key in categories:
+        categories[key].sort()
+    
+    return categories
+
+
+def get_allowed_tables(categories: dict) -> list:
+    """Get list of tables allowed for AI queries (marts, dims, facts)."""
+    allowed = []
+    allowed.extend(categories['marts'])
+    allowed.extend(categories['dimensions'])
+    allowed.extend(categories['facts'])
+    # Don't include staging or metrics intermediate tables
+    return sorted(allowed)
 
 
 def format_columns_table(columns: list, max_cols: int = 30) -> str:
@@ -103,19 +155,36 @@ def format_columns_table(columns: list, max_cols: int = 30) -> str:
     return '\n'.join(lines)
 
 
-def generate_schema_md(dbt_path: Path) -> str:
-    """Generate the optimized schema_ai.md content."""
-    models_path = dbt_path / 'models'
-    profile = load_dbt_profile(dbt_path)
-    schemas = load_all_schemas(models_path)
+def generate_mart_quick_reference(marts: list, schemas: dict) -> str:
+    """Generate quick reference for mart tables."""
+    lines = ["**USE THESE TABLES** (pre-joined, no manual joins needed):"]
     
-    # Define which tables to include and their priority
-    mart_tables = ['mart_sales', 'mart_customer_analytics', 'mart_product_analytics', 
-                   'mart_operations', 'mart_employee_territory_performance']
-    dim_tables = ['dim_customer', 'dim_product', 'dim_territory', 'dim_date', 
-                  'dim_employee', 'dim_vendor', 'dim_metric']
-    fact_tables = ['fact_global_metrics', 'fact_sales_order', 'fact_sales_order_line',
-                   'fact_inventory', 'fact_purchase_order', 'fact_work_order', 'fact_employee_quota']
+    # Define short descriptions for common marts
+    mart_descriptions = {
+        'mart_sales': 'Sales with customer, product, territory',
+        'mart_customer_analytics': 'CLV, RFM, churn prediction',
+        'mart_product_analytics': 'Product performance, inventory',
+        'mart_operations': 'Purchase orders, work orders',
+        'mart_employee_territory_performance': 'Quotas, performance',
+        'mart_metrics': '⭐ **ALL METRICS** with definitions, targets, categories',
+    }
+    
+    for mart in marts:
+        if mart in schemas:
+            # Use predefined description or generate from schema
+            if mart in mart_descriptions:
+                desc = mart_descriptions[mart]
+            else:
+                schema_desc = schemas[mart].get('description', '')
+                desc = schema_desc.split('\n')[0][:50] if schema_desc else 'Pre-joined data mart'
+            lines.append(f"- `{mart}` - {desc}")
+    
+    return '\n'.join(lines)
+
+
+def generate_schema_md(dbt_path: Path, schemas: dict, categories: dict) -> str:
+    """Generate the optimized schema_ai.md content."""
+    profile = load_dbt_profile(dbt_path)
     
     # Build the markdown content
     content = f"""# AdventureWorks Data Warehouse Schema (AI Context)
@@ -126,12 +195,7 @@ def generate_schema_md(dbt_path: Path) -> str:
 
 ## Quick Reference
 
-**USE THESE TABLES** (pre-joined, no manual joins needed):
-- `mart_sales` - Sales with customer, product, territory
-- `mart_customer_analytics` - CLV, RFM, churn prediction
-- `mart_product_analytics` - Product performance, inventory
-- `mart_operations` - Purchase orders, work orders
-- `mart_employee_territory_performance` - Quotas, performance
+{generate_mart_quick_reference(categories['marts'], schemas)}
 
 ---
 
@@ -140,7 +204,7 @@ def generate_schema_md(dbt_path: Path) -> str:
 """
     
     # Add mart tables
-    for table in mart_tables:
+    for table in categories['marts']:
         if table in schemas:
             schema = schemas[table]
             desc = schema['description'].split('\n')[0] if schema['description'] else ''
@@ -172,6 +236,14 @@ FROM mart_customer_analytics GROUP BY customer_segment
 -- Product performance
 SELECT product_name, total_revenue, profit_margin_percent 
 FROM mart_product_analytics ORDER BY total_revenue DESC LIMIT 10
+
+-- All metrics values (USE mart_metrics!)
+SELECT metric_name, metric_category, metric_value, metric_unit, report_date
+FROM mart_metrics ORDER BY metric_category, metric_name
+
+-- Metrics by category
+SELECT metric_category, COUNT(*) as metric_count, AVG(metric_value) as avg_value
+FROM mart_metrics GROUP BY metric_category ORDER BY metric_count DESC
 ```
 
 ---
@@ -198,7 +270,7 @@ JOIN dim_customer dc ON fact.customer_key = dc.customerid  -- NOT dc.customer_ke
 """
     
     # Add dimension tables (condensed)
-    for table in dim_tables:
+    for table in categories['dimensions']:
         if table in schemas:
             schema = schemas[table]
             cols = [c.get('name', '') for c in schema['columns'][:10]]
@@ -211,7 +283,7 @@ JOIN dim_customer dc ON fact.customer_key = dc.customerid  -- NOT dc.customer_ke
 
 """
     
-    for table in fact_tables:
+    for table in categories['facts']:
         if table in schemas:
             schema = schemas[table]
             desc = schema['description'].split('\n')[0] if schema['description'] else ''
@@ -223,11 +295,12 @@ JOIN dim_customer dc ON fact.customer_key = dc.customerid  -- NOT dc.customer_ke
 ## SQL Guidelines
 
 1. **Always use mart tables** - they have everything pre-joined
-2. Use `SUM()`, `AVG()`, `COUNT()` for aggregations
-3. Include `ORDER BY` for sorted results
-4. Use `LIMIT` for top-N (default 10-20)
-5. Filter NULLs: `WHERE column IS NOT NULL`
-6. Time filters: `WHERE order_year = 2014`
+2. **Use mart_metrics for any metric queries** - it has all metric definitions
+3. Use `SUM()`, `AVG()`, `COUNT()` for aggregations
+4. Include `ORDER BY` for sorted results
+5. Use `LIMIT` for top-N (default 10-20)
+6. Filter NULLs: `WHERE column IS NOT NULL`
+7. Time filters: `WHERE order_year = 2014`
 
 ## Response Format
 
@@ -238,30 +311,66 @@ If the question cannot be answered, respond with: `-- ERROR: [reason]`
     return content
 
 
+def generate_allowed_tables_json(allowed_tables: list, output_path: Path):
+    """Generate allowed_tables.json for SQL validator."""
+    data = {
+        "_comment": "Auto-generated by dbt/scripts/generate_ai_schema.py - DO NOT EDIT MANUALLY",
+        "_generated": datetime.now().isoformat(),
+        "allowed_tables": allowed_tables
+    }
+    
+    with open(output_path, 'w') as f:
+        json.dump(data, f, indent=2)
+    
+    return len(allowed_tables)
+
+
 def main():
-    """Main function to generate schema_ai.md."""
+    """Main function to generate AI schema files."""
     # Get dbt directory (script is in dbt/scripts/)
     script_dir = Path(__file__).parent
     dbt_path = script_dir.parent
     models_path = dbt_path / 'models'
-    output_path = models_path / 'schema_ai.md'
+    output_md_path = models_path / 'schema_ai.md'
+    
+    # Path to streamlit AI module
+    streamlit_ai_path = dbt_path.parent / 'streamlit' / 'ai'
+    output_json_path = streamlit_ai_path / 'allowed_tables.json'
     
     print("🤖 Generating AI schema context...")
     print(f"   Source: {models_path}")
-    print(f"   Output: {output_path}")
     
-    # Generate content
-    content = generate_schema_md(dbt_path)
+    # Load all schemas
+    schemas = load_all_schemas(models_path)
+    print(f"   Found {len(schemas)} models in schema files")
     
-    # Write to file
-    with open(output_path, 'w') as f:
+    # Categorize tables
+    categories = categorize_tables(schemas)
+    print(f"   Marts: {len(categories['marts'])}, Dims: {len(categories['dimensions'])}, Facts: {len(categories['facts'])}")
+    
+    # Generate schema_ai.md
+    content = generate_schema_md(dbt_path, schemas, categories)
+    with open(output_md_path, 'w') as f:
         f.write(content)
     
     # Count approximate tokens (rough estimate: 1 token ≈ 4 chars)
     token_estimate = len(content) // 4
-    
     print(f"✅ Generated schema_ai.md ({len(content):,} chars, ~{token_estimate:,} tokens)")
+    
+    # Generate allowed_tables.json
+    allowed_tables = get_allowed_tables(categories)
+    if streamlit_ai_path.exists():
+        table_count = generate_allowed_tables_json(allowed_tables, output_json_path)
+        print(f"✅ Generated allowed_tables.json ({table_count} tables)")
+    else:
+        print(f"⚠️  Skipped allowed_tables.json (streamlit/ai/ not found)")
+    
     print(f"💰 Estimated cost savings: ~30% vs YAML-based context")
+    
+    # Print summary of allowed tables
+    print(f"\n📋 Allowed tables for AI queries:")
+    for table in allowed_tables:
+        print(f"   - {table}")
 
 
 if __name__ == '__main__':

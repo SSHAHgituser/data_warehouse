@@ -262,6 +262,9 @@ data_warehouse/
 ├── stop.sh                     # Shutdown script for all services
 ├── dbt/                        # dbt project
 │   ├── models/                 # SQL models (staging, intermediate, marts)
+│   │   └── schema_ai.md        # Auto-generated AI context (by run_dbt.sh)
+│   ├── scripts/
+│   │   └── generate_ai_schema.py  # AI sync script (auto-run on dbt run)
 │   ├── profiles.yml            # Database connection config
 │   ├── run_dbt.sh              # Convenience script for running dbt commands
 │   ├── setup_venv.sh           # Virtual environment setup script
@@ -271,6 +274,8 @@ data_warehouse/
 ├── streamlit/                  # Streamlit dashboard
 │   ├── app.py                  # Main dashboard application
 │   ├── pages/                  # Multi-page analytics modules
+│   ├── ai/                     # AI Analytics Assistant module
+│   │   └── allowed_tables.json # Auto-generated table whitelist (by dbt run)
 │   ├── run.sh                  # Convenience script for local development
 │   ├── requirements.txt        # Python dependencies
 │   └── README.md               # Streamlit-specific documentation
@@ -315,6 +320,21 @@ EOF
 3. Ask questions in plain English!
 
 For more details, see [streamlit/ai/README.md](streamlit/ai/README.md).
+
+### AI Sync with dbt Models
+
+When you add new dbt models, the AI components are **automatically synchronized**:
+
+```bash
+cd dbt
+./run_dbt.sh run   # Runs dbt AND syncs AI components
+```
+
+This auto-generates:
+- `dbt/models/schema_ai.md` - Optimized LLM context
+- `streamlit/ai/allowed_tables.json` - SQL validator whitelist
+
+**No manual updates needed!** New tables are automatically available to the AI assistant.
 
 ---
 

@@ -153,11 +153,37 @@ dbt [command]
 ```
 
 Common commands:
-- `dbt run` - Run all models
+- `dbt run` - Run all models (+ auto-sync AI components)
 - `dbt test` - Run all tests
-- `dbt build` - Run models and tests
+- `dbt build` - Run models and tests (+ auto-sync AI components)
 - `dbt docs generate` - Generate documentation
 - `dbt docs serve` - Serve docs locally (port 8080)
+
+### AI Component Synchronization
+
+When you run `./run_dbt.sh run` or `./run_dbt.sh build`, the script automatically:
+
+1. **Generates `schema_ai.md`** - Optimized schema context for the AI assistant
+2. **Updates `allowed_tables.json`** - Whitelist for SQL validator security
+
+This keeps the AI Analytics Assistant in sync with your dbt models without manual updates.
+
+```bash
+# Example: Add a new mart model
+# 1. Create the model SQL file
+# 2. Add schema definition to _schema.yml
+# 3. Run dbt - AI components auto-sync!
+./run_dbt.sh run
+
+# Output includes:
+# 🔄 Syncing AI components with dbt models...
+# ✅ Generated schema_ai.md (X chars, ~Y tokens)
+# ✅ Generated allowed_tables.json (N tables)
+```
+
+**Generated files:**
+- `dbt/models/schema_ai.md` - LLM context (auto-generated, do not edit)
+- `streamlit/ai/allowed_tables.json` - Table whitelist (auto-generated, do not edit)
 
 ### Project Structure
 
@@ -166,14 +192,18 @@ dbt/
 ├── models/
 │   ├── staging/          # Raw data transformations
 │   ├── intermediate/     # Dimensions and facts
-│   └── marts/            # Analytics-ready tables
+│   ├── marts/            # Analytics-ready tables
+│   └── schema_ai.md      # Auto-generated AI context
+├── scripts/
+│   └── generate_ai_schema.py  # AI sync script (run automatically)
 ├── macros/               # Reusable SQL macros
 ├── seeds/                # Seed data files
 ├── tests/                # Custom tests
 ├── analyses/             # Ad-hoc analyses
 ├── dbt_project.yml       # Project configuration
 ├── profiles.yml          # Database connection config
-└── README.md            # This file
+├── run_dbt.sh            # Convenience script (includes AI sync)
+└── README.md             # This file
 ```
 
 ## Troubleshooting
