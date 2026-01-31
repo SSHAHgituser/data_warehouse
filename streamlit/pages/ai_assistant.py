@@ -62,34 +62,59 @@ def render(conn):
         st.markdown("---")
         st.subheader("🔧 AI Settings")
         
-        # API Key input if not set
-        if not api_key:
-            st.warning("⚠️ No API key detected")
-            api_provider = st.selectbox(
-                "Select AI Provider",
-                ["OpenAI (GPT-4)", "Anthropic (Claude)"],
-                key="ai_provider"
-            )
-            
-            api_key_input = st.text_input(
-                "Enter API Key",
-                type="password",
-                help="Your API key will be stored in session state only",
-                key="api_key_input"
-            )
-            
-            if api_key_input:
-                if "OpenAI" in api_provider:
-                    os.environ["OPENAI_API_KEY"] = api_key_input
-                    provider = "openai"
-                else:
-                    os.environ["ANTHROPIC_API_KEY"] = api_key_input
-                    provider = "anthropic"
-                st.success(f"✓ {api_provider.split()[0]} API key set")
-                api_key = api_key_input
-        else:
+        # API Key management
+        if api_key:
             provider_name = "OpenAI GPT-4" if provider == "openai" else "Anthropic Claude"
             st.success(f"✓ Using {provider_name}")
+            
+            # Button to update API key
+            if st.button("🔑 Update API Key", key="update_api_key"):
+                st.session_state.show_api_form = True
+        else:
+            st.warning("⚠️ No API key detected")
+            st.session_state.show_api_form = True
+        
+        # Show API key form
+        if st.session_state.get('show_api_form', False) or not api_key:
+            with st.form(key="api_key_form"):
+                api_provider = st.selectbox(
+                    "Select AI Provider",
+                    ["OpenAI (GPT-4)", "Anthropic (Claude)"],
+                    key="ai_provider_select"
+                )
+                
+                api_key_input = st.text_input(
+                    "Enter API Key",
+                    type="password",
+                    help="Your API key will be stored in session state only",
+                    key="api_key_field"
+                )
+                
+                submitted = st.form_submit_button("💾 Save API Key")
+                
+                if submitted and api_key_input:
+                    if "OpenAI" in api_provider:
+                        os.environ["OPENAI_API_KEY"] = api_key_input
+                        # Clear anthropic key if switching
+                        if "ANTHROPIC_API_KEY" in os.environ:
+                            del os.environ["ANTHROPIC_API_KEY"]
+                        provider = "openai"
+                    else:
+                        os.environ["ANTHROPIC_API_KEY"] = api_key_input
+                        # Clear openai key if switching
+                        if "OPENAI_API_KEY" in os.environ:
+                            del os.environ["OPENAI_API_KEY"]
+                        provider = "anthropic"
+                    
+                    api_key = api_key_input
+                    st.session_state.show_api_form = False
+                    
+                    # Reset SQL generator with new key
+                    if 'sql_generator' in st.session_state:
+                        del st.session_state.sql_generator
+                    
+                    st.success(f"✓ {api_provider.split()[0]} API key saved!")
+                    st.rerun()
         
         # Clear conversation button
         if st.button("🗑️ Clear Conversation", key="clear_conv"):
@@ -146,6 +171,12 @@ def render(conn):
                     if message.get("sql"):
                         with st.expander("🔍 View SQL Query", expanded=False):
                             st.code(message["sql"], language="sql")
+                    
+                    # Show analysis if available
+                    if message.get("analysis"):
+                        st.markdown("### 💡 Analysis")
+                        st.markdown(message["analysis"])
+                        st.divider()
                     
                     # Show results
                     if message.get("dataframe") is not None:
@@ -209,95 +240,123 @@ def process_question(conn, question: str):
     
     # Generate response
     with st.chat_message("assistant", avatar="🤖"):
-        with st.spinner("🔄 Generating SQL..."):
-            try:
-                # Generate SQL
-                sql_generator = st.session_state.sql_generator
-                visualizer = st.session_state.visualizer
-                
-                sql, is_valid, error = sql_generator.generate(question)
-                
-                if not is_valid:
-                    error_msg = f"❌ {error}" if error else "Could not generate a valid SQL query."
-                    st.error(error_msg)
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "error": error_msg,
-                        "timestamp": datetime.now().timestamp()
-                    })
-                    return
-                
-                # Show SQL
-                with st.expander("🔍 View SQL Query", expanded=False):
-                    st.code(sql, language="sql")
-                
-                # Execute query
-                with st.spinner("⚡ Running query..."):
-                    try:
-                        df = pd.read_sql(sql, conn)
-                    except Exception as e:
-                        error_msg = f"❌ Query execution error: {str(e)}"
-                        st.error(error_msg)
-                        st.session_state.messages.append({
-                            "role": "assistant",
-                            "sql": sql,
-                            "error": error_msg,
-                            "timestamp": datetime.now().timestamp()
-                        })
-                        return
-                
-                # Generate visualization
-                figure, chart_type = visualizer.analyze_and_visualize(df, question)
-                metric_cards = visualizer.create_metric_cards(df) if len(df) == 1 else None
-                
-                # Display results
-                if figure:
-                    st.plotly_chart(figure, use_container_width=True)
-                
-                if metric_cards:
-                    cols = st.columns(len(metric_cards))
-                    for i, card in enumerate(metric_cards):
-                        with cols[i]:
-                            st.metric(label=card["label"], value=card["value"])
-                
-                # Show data table
-                st.markdown(f"**Results:** {len(df):,} rows")
-                st.dataframe(
-                    format_dataframe(df.head(100)),
-                    use_container_width=True,
-                    hide_index=True
-                )
-                
-                # Download button
-                csv = df.to_csv(index=False)
-                timestamp = datetime.now().timestamp()
-                st.download_button(
-                    label="📥 Download CSV",
-                    data=csv,
-                    file_name=f"query_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                    mime="text/csv",
-                    key=f"download_{timestamp}"
-                )
-                
-                # Store in session state
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "sql": sql,
-                    "dataframe": df,
-                    "figure": figure,
-                    "chart_type": chart_type,
-                    "metric_cards": metric_cards,
-                    "timestamp": timestamp
-                })
-                
-            except Exception as e:
-                error_msg = f"❌ Unexpected error: {str(e)}"
+        try:
+            # Generate SQL with automatic retry
+            sql_generator = st.session_state.sql_generator
+            visualizer = st.session_state.visualizer
+            
+            # Status placeholder for retry updates
+            status_placeholder = st.empty()
+            
+            def update_status(attempt, message):
+                status_placeholder.info(message)
+            
+            # Generate with retry (up to 3 attempts)
+            sql, is_valid, error, attempt_history = sql_generator.generate_with_retry(
+                question, 
+                conn, 
+                max_retries=3,
+                status_callback=update_status
+            )
+            
+            # Clear status after completion
+            status_placeholder.empty()
+            
+            # Show attempt history if there were retries
+            if len(attempt_history) > 1:
+                with st.expander(f"🔄 Attempted {len(attempt_history)} approaches", expanded=False):
+                    for record in attempt_history:
+                        attempt_num = record['attempt']
+                        if record['success']:
+                            st.success(f"✅ Attempt {attempt_num}: Success")
+                        else:
+                            st.warning(f"⚠️ Attempt {attempt_num}: {record.get('execution_error') or record.get('validation_error', 'Failed')[:100]}")
+                        if record['sql']:
+                            st.code(record['sql'][:300] + "..." if len(record['sql']) > 300 else record['sql'], language="sql")
+            
+            if not is_valid:
+                error_msg = f"❌ {error}" if error else "Could not generate a valid SQL query after multiple attempts."
                 st.error(error_msg)
                 st.session_state.messages.append({
                     "role": "assistant",
                     "error": error_msg,
+                    "attempts": len(attempt_history),
                     "timestamp": datetime.now().timestamp()
                 })
+                return
+            
+            # Show successful SQL
+            with st.expander("🔍 View SQL Query", expanded=False):
+                st.code(sql, language="sql")
+            
+            # Execute final query (already validated in retry loop)
+            df = pd.read_sql(sql, conn)
+            
+            # Generate visualization
+            figure, chart_type = visualizer.analyze_and_visualize(df, question)
+            metric_cards = visualizer.create_metric_cards(df) if len(df) == 1 else None
+            
+            # Generate AI analysis of results
+            analysis = None
+            if len(df) > 0:
+                with st.spinner("🧠 Analyzing results..."):
+                    analysis = sql_generator.analyze_results(question, sql, df)
+            
+            # Display AI analysis first
+            if analysis:
+                st.markdown("### 💡 Analysis")
+                st.markdown(analysis)
+                st.divider()
+            
+            # Display visualization
+            if figure:
+                st.plotly_chart(figure, use_container_width=True)
+            
+            if metric_cards:
+                cols = st.columns(len(metric_cards))
+                for i, card in enumerate(metric_cards):
+                    with cols[i]:
+                        st.metric(label=card["label"], value=card["value"])
+            
+            # Show data table
+            st.markdown(f"**Results:** {len(df):,} rows")
+            st.dataframe(
+                format_dataframe(df.head(100)),
+                use_container_width=True,
+                hide_index=True
+            )
+            
+            # Download button
+            csv = df.to_csv(index=False)
+            timestamp = datetime.now().timestamp()
+            st.download_button(
+                label="📥 Download CSV",
+                data=csv,
+                file_name=f"query_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                mime="text/csv",
+                key=f"download_{timestamp}"
+            )
+            
+            # Store in session state
+            st.session_state.messages.append({
+                "role": "assistant",
+                "sql": sql,
+                "analysis": analysis,
+                "dataframe": df,
+                "figure": figure,
+                "chart_type": chart_type,
+                "metric_cards": metric_cards,
+                "timestamp": timestamp
+            })
+            
+        except Exception as e:
+            error_msg = f"❌ Unexpected error: {str(e)}"
+            st.error(error_msg)
+            st.session_state.messages.append({
+                "role": "assistant",
+                "error": error_msg,
+                "timestamp": datetime.now().timestamp()
+            })
 
 
 def show_capabilities():

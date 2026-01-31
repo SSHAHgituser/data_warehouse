@@ -4,6 +4,8 @@
 > 
 > *Auto-generated on 2026-01-31 13:54 by generate_ai_schema.py*
 
+⚠️ **IMPORTANT: Use EXACT table names below. Names are SINGULAR (e.g., `dim_metric` NOT `dim_metrics`).**
+
 ## Quick Reference
 
 **USE THESE TABLES** (pre-joined, no manual joins needed):
@@ -50,28 +52,40 @@ Employee and territory performance mart - supports employee performance tracking
 
 Metrics mart - joins fact_global_metrics with dim_metric for complete metric information.
 
-| Column | Description |
-|--------|-------------|
-| metric_record_id | Surrogate key |
-| date_key | Date key (YYYYMMDD) |
-| report_date | Snapshot date |
-| metric_key | Metric identifier (FK to dim_metric) |
-| metric_name | Human-readable metric name |
-| metric_description | Business definition of the metric |
-| metric_category | Category: Sales, Inventory, HR, Operations, etc. |
-| metric_unit | Unit: USD, Count, Percent, Days |
-| metric_level | Hierarchy level: L1-L5 |
-| metric_parent | Parent metric key (for drill-down) |
-| metric_target | Target/goal for this metric |
-| alert_criteria | Conditions for alerting |
-| recommended_actions | Suggested actions when metric is off-target |
-| metric_value | The numeric metric value |
-| source_table | Source fact table name |
-| customer_key | FK to dim_customer |
-| product_key | FK to dim_product |
-| employee_key | FK to dim_employee |
-| territory_key | FK to dim_territory |
-| vendor_key | FK to dim_vendor |
+| Column | Type | Description |
+|--------|------|-------------|
+| metric_record_id | INT | Surrogate key |
+| date_key | INT | Date key (YYYYMMDD) |
+| report_date | DATE | Snapshot date |
+| metric_key | TEXT | Metric identifier (FK to dim_metric) |
+| metric_name | TEXT | Human-readable metric name |
+| metric_description | TEXT | Business definition of the metric |
+| metric_category | TEXT | Category: Sales, Inventory, HR, Operations |
+| metric_unit | TEXT | Unit: USD, Count, Percent, Days |
+| metric_level | TEXT | Hierarchy level: L1-L5 |
+| metric_parent | TEXT | Parent metric key (for drill-down) |
+| metric_target | TEXT ⚠️ | Target description (TEXT, not numeric - e.g. "YoY growth >= 10%") |
+| alert_criteria | TEXT | Conditions for alerting (TEXT description) |
+| recommended_actions | TEXT | Suggested actions (TEXT description) |
+| **metric_value** | NUMERIC ✅ | **The numeric metric value - USE THIS for aggregations** |
+| source_table | TEXT | Source fact table name |
+| customer_key | INT | FK to dim_customer |
+| product_key | INT | FK to dim_product |
+| employee_key | INT | FK to dim_employee |
+| territory_key | INT | FK to dim_territory |
+| vendor_key | INT | FK to dim_vendor |
+
+**⚠️ IMPORTANT**: Only `metric_value` is numeric! Do NOT use AVG/SUM on `metric_target`, `alert_criteria`, or `recommended_actions` - they are TEXT.
+
+**📊 FORMAT VALUES BY `metric_unit`:**
+| metric_unit | Format | Example |
+|-------------|--------|---------|
+| USD | Currency with $ and commas | $1,234,567.89 |
+| Percent | Percentage with % | 85.5% |
+| Count | Integer with commas | 1,234 |
+| Days | Number + "days" | 5.2 days |
+| Hours | Number + "hours" | 48 hours |
+| Ratio | Decimal (2 places) | 1.25 |
 
 ### mart_operations
 
@@ -144,13 +158,21 @@ FROM mart_customer_analytics GROUP BY customer_segment
 SELECT product_name, total_revenue, profit_margin_percent 
 FROM mart_product_analytics ORDER BY total_revenue DESC LIMIT 10
 
--- All metrics values (USE mart_metrics!)
-SELECT metric_name, metric_category, metric_value, metric_unit, report_date
+-- All metrics with values and descriptions (USE mart_metrics!)
+SELECT metric_name, metric_category, metric_value, metric_unit, metric_target, recommended_actions
 FROM mart_metrics ORDER BY metric_category, metric_name
 
--- Metrics by category
-SELECT metric_category, COUNT(*) as metric_count, AVG(metric_value) as avg_value
+-- Metrics aggregated by category (ONLY aggregate metric_value, not text columns!)
+SELECT metric_category, 
+       COUNT(*) as metric_count, 
+       AVG(metric_value) as avg_value,
+       SUM(metric_value) as total_value
 FROM mart_metrics GROUP BY metric_category ORDER BY metric_count DESC
+
+-- Business performance summary (show metrics with their targets and actions)
+SELECT metric_category, metric_name, metric_value, metric_unit, metric_target, recommended_actions
+FROM mart_metrics WHERE metric_level IN ('L4_Strategic', 'L5_KPI')
+ORDER BY metric_category, metric_name
 ```
 
 ---
@@ -224,13 +246,14 @@ Work order fact - one row per work order
 
 ## SQL Guidelines
 
-1. **Always use mart tables** - they have everything pre-joined
-2. **Use mart_metrics for any metric queries** - it has all metric definitions
-3. Use `SUM()`, `AVG()`, `COUNT()` for aggregations
-4. Include `ORDER BY` for sorted results
-5. Use `LIMIT` for top-N (default 10-20)
-6. Filter NULLs: `WHERE column IS NOT NULL`
-7. Time filters: `WHERE order_year = 2014`
+1. **Use EXACT table names** - `dim_metric` NOT `dim_metrics`, `mart_sales` NOT `mart_sale`
+2. **Always use mart tables** - they have everything pre-joined
+3. **Use mart_metrics for any metric queries** - it has all metric definitions
+4. Use `SUM()`, `AVG()`, `COUNT()` for aggregations (only on numeric columns!)
+5. Include `ORDER BY` for sorted results
+6. Use `LIMIT` for top-N (default 10-20)
+7. Filter NULLs: `WHERE column IS NOT NULL`
+8. Time filters: `WHERE order_year = 2014`
 
 ## Response Format
 

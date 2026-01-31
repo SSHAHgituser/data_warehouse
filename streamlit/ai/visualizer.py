@@ -287,14 +287,20 @@ class ResultVisualizer:
             
             # Format value based on column type
             col_lower = col.lower()
-            if any(p in col_lower for p in self.CURRENCY_PATTERNS):
-                formatted = f"${value:,.2f}" if pd.notna(value) else "N/A"
-            elif any(p in col_lower for p in self.PERCENT_PATTERNS):
-                formatted = f"{value:.1f}%" if pd.notna(value) else "N/A"
-            elif any(p in col_lower for p in self.COUNT_PATTERNS):
-                formatted = f"{int(value):,}" if pd.notna(value) else "N/A"
+            is_numeric = isinstance(value, (int, float)) and pd.notna(value)
+            
+            if is_numeric and any(p in col_lower for p in self.CURRENCY_PATTERNS):
+                formatted = f"${value:,.2f}"
+            elif is_numeric and any(p in col_lower for p in self.PERCENT_PATTERNS):
+                formatted = f"{value:.1f}%"
+            elif is_numeric and any(p in col_lower for p in self.COUNT_PATTERNS):
+                formatted = f"{int(value):,}"
+            elif is_numeric:
+                formatted = f"{value:,.2f}"
+            elif pd.isna(value):
+                formatted = "N/A"
             else:
-                formatted = f"{value:,.2f}" if isinstance(value, (int, float)) else str(value)
+                formatted = str(value)
             
             cards.append({
                 'label': self._humanize(col),

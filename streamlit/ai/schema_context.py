@@ -40,8 +40,16 @@ class SchemaContext:
         self._dbt_profile_cache: Optional[dict] = None
         self._markdown_schema_cache: Optional[str] = None
         
-        # Path to dbt directory (relative to streamlit/)
-        self.dbt_path = Path(__file__).parent.parent.parent / 'dbt'
+        # Path to dbt directory
+        # In Docker: /dbt/models/ (mounted volume)
+        # Local: ../dbt/models/ (relative path)
+        docker_dbt_path = Path('/dbt')
+        local_dbt_path = Path(__file__).parent.parent.parent / 'dbt'
+        
+        if docker_dbt_path.exists():
+            self.dbt_path = docker_dbt_path
+        else:
+            self.dbt_path = local_dbt_path
         self.dbt_models_path = self.dbt_path / 'models'
     
     def load_markdown_schema(self) -> str:

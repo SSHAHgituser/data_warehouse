@@ -37,6 +37,8 @@ services:
     volumes:
       - ./streamlit/app.py:/app/app.py:ro
       - ./streamlit/pages:/app/pages:ro
+      - ./streamlit/ai:/app/ai:ro
+      - ./dbt/models/schema_ai.md:/dbt/models/schema_ai.md:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.connect(('localhost', 8501)); s.close()"]
       interval: 30s

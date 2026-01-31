@@ -25,6 +25,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application code
 COPY app.py .
 COPY pages/ ./pages/
+COPY ai/ ./ai/
 
 # Expose Streamlit port
 EXPOSE 8501
