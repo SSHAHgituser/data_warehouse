@@ -6,16 +6,10 @@
     Extracts metrics from fact_sales_order (order-level granularity)
     
     Metrics included:
-    - SO_REVENUE: Total order revenue
-    - SO_SUBTOTAL: Order subtotal
-    - SO_TAX: Tax amount
-    - SO_FREIGHT: Freight charges
-    - SO_QUANTITY: Total quantity ordered
-    - SO_LINE_ITEMS: Number of line items
-    - SO_DISCOUNT: Total discount amount
-    - SO_DAYS_TO_SHIP: Days from order to ship
+    - SO_REVENUE, SO_SUBTOTAL, SO_TAX, SO_FREIGHT
+    - SO_QUANTITY, SO_LINE_ITEMS, SO_DISCOUNT, SO_DAYS_TO_SHIP
     
-    Relevant dimensions: customer, employee, territory, ship_method, credit_card, online_order_flag, order_status
+    Note: metric_name, metric_category, and metric_unit come from dim_metric (single source of truth)
 #}
 
 with report_date_calc as (
@@ -44,20 +38,17 @@ select
     
     -- Metric columns
     metric_key,
-    metric_name,
-    metric_category,
-    metric_value,
-    metric_unit
+    metric_value
 from {{ ref('fact_sales_order') }}
 cross join lateral (
     values
-        ('SO_REVENUE', 'Sales Order Revenue', 'Sales', totaldue::numeric, 'USD'),
-        ('SO_SUBTOTAL', 'Sales Order Subtotal', 'Sales', subtotal::numeric, 'USD'),
-        ('SO_TAX', 'Sales Order Tax', 'Sales', taxamt::numeric, 'USD'),
-        ('SO_FREIGHT', 'Sales Order Freight', 'Sales', freight::numeric, 'USD'),
-        ('SO_QUANTITY', 'Sales Order Quantity', 'Sales', total_quantity::numeric, 'Count'),
-        ('SO_LINE_ITEMS', 'Sales Order Line Items', 'Sales', number_of_line_items::numeric, 'Count'),
-        ('SO_DISCOUNT', 'Sales Order Discount', 'Sales', coalesce(total_discount_amount, 0)::numeric, 'USD'),
-        ('SO_DAYS_TO_SHIP', 'Days to Ship', 'Sales', coalesce(days_to_ship, 0)::numeric, 'Days')
-) as metrics(metric_key, metric_name, metric_category, metric_value, metric_unit)
+        ('SO_REVENUE', totaldue::numeric),
+        ('SO_SUBTOTAL', subtotal::numeric),
+        ('SO_TAX', taxamt::numeric),
+        ('SO_FREIGHT', freight::numeric),
+        ('SO_QUANTITY', total_quantity::numeric),
+        ('SO_LINE_ITEMS', number_of_line_items::numeric),
+        ('SO_DISCOUNT', coalesce(total_discount_amount, 0)::numeric),
+        ('SO_DAYS_TO_SHIP', coalesce(days_to_ship, 0)::numeric)
+) as metrics(metric_key, metric_value)
 where metric_value is not null

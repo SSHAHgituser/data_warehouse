@@ -6,14 +6,10 @@
     Extracts metrics from fact_employee_quota (employee/period granularity)
     
     Metrics included:
-    - EQ_QUOTA: Sales quota amount
-    - EQ_SALES_YTD: Sales year to date
-    - EQ_SALES_LAST_YEAR: Sales from last year
-    - EQ_ACHIEVEMENT_PCT: Quota achievement percentage
-    - EQ_QUOTA_VARIANCE: Variance from quota
-    - EQ_BONUS: Employee bonus amount
+    - EQ_QUOTA, EQ_SALES_YTD, EQ_SALES_LAST_YEAR
+    - EQ_ACHIEVEMENT_PCT, EQ_QUOTA_VARIANCE, EQ_BONUS
     
-    Relevant dimensions: employee, territory, quota_status
+    Note: metric_name, metric_category, and metric_unit come from dim_metric (single source of truth)
 #}
 
 with report_date_calc as (
@@ -39,18 +35,15 @@ select
     
     -- Metric columns
     metric_key,
-    metric_name,
-    metric_category,
-    metric_value,
-    metric_unit
+    metric_value
 from {{ ref('fact_employee_quota') }}
 cross join lateral (
     values
-        ('EQ_QUOTA', 'Sales Quota', 'HR', salesquota::numeric, 'USD'),
-        ('EQ_SALES_YTD', 'Sales Year to Date', 'HR', coalesce(salesytd, 0)::numeric, 'USD'),
-        ('EQ_SALES_LAST_YEAR', 'Sales Last Year', 'HR', coalesce(saleslastyear, 0)::numeric, 'USD'),
-        ('EQ_ACHIEVEMENT_PCT', 'Quota Achievement Percent', 'HR', coalesce(quota_achievement_percent, 0)::numeric, 'Percent'),
-        ('EQ_QUOTA_VARIANCE', 'Quota Variance', 'HR', coalesce(quota_variance, 0)::numeric, 'USD'),
-        ('EQ_BONUS', 'Employee Bonus', 'HR', coalesce(bonus, 0)::numeric, 'USD')
-) as metrics(metric_key, metric_name, metric_category, metric_value, metric_unit)
+        ('EQ_QUOTA', salesquota::numeric),
+        ('EQ_SALES_YTD', coalesce(salesytd, 0)::numeric),
+        ('EQ_SALES_LAST_YEAR', coalesce(saleslastyear, 0)::numeric),
+        ('EQ_ACHIEVEMENT_PCT', coalesce(quota_achievement_percent, 0)::numeric),
+        ('EQ_QUOTA_VARIANCE', coalesce(quota_variance, 0)::numeric),
+        ('EQ_BONUS', coalesce(bonus, 0)::numeric)
+) as metrics(metric_key, metric_value)
 where metric_value is not null

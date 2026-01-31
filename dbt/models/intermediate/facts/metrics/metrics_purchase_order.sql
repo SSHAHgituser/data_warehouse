@@ -6,18 +6,11 @@
     Extracts metrics from fact_purchase_order (order-level granularity)
     
     Metrics included:
-    - PO_AMOUNT: Total purchase order amount
-    - PO_SUBTOTAL: Purchase order subtotal
-    - PO_TAX: Tax amount
-    - PO_FREIGHT: Freight charges
-    - PO_QUANTITY: Total quantity ordered
-    - PO_RECEIVED_QTY: Quantity received
-    - PO_REJECTED_QTY: Quantity rejected
-    - PO_REJECTION_RATE: Rejection rate percentage
-    - PO_FULFILLMENT_RATE: Fulfillment rate percentage
-    - PO_DAYS_TO_SHIP: Days from order to ship
+    - PO_AMOUNT, PO_SUBTOTAL, PO_TAX, PO_FREIGHT, PO_QUANTITY
+    - PO_RECEIVED_QTY, PO_REJECTED_QTY, PO_REJECTION_RATE
+    - PO_FULFILLMENT_RATE, PO_DAYS_TO_SHIP
     
-    Relevant dimensions: vendor, employee, ship_method, order_status
+    Note: metric_name, metric_category, and metric_unit come from dim_metric (single source of truth)
 #}
 
 with report_date_calc as (
@@ -43,22 +36,19 @@ select
     
     -- Metric columns
     metric_key,
-    metric_name,
-    metric_category,
-    metric_value,
-    metric_unit
+    metric_value
 from {{ ref('fact_purchase_order') }}
 cross join lateral (
     values
-        ('PO_AMOUNT', 'Purchase Order Amount', 'Procurement', totaldue::numeric, 'USD'),
-        ('PO_SUBTOTAL', 'Purchase Order Subtotal', 'Procurement', subtotal::numeric, 'USD'),
-        ('PO_TAX', 'Purchase Order Tax', 'Procurement', taxamt::numeric, 'USD'),
-        ('PO_FREIGHT', 'Purchase Order Freight', 'Procurement', freight::numeric, 'USD'),
-        ('PO_QUANTITY', 'Purchase Order Quantity', 'Procurement', coalesce(total_quantity, 0)::numeric, 'Count'),
-        ('PO_RECEIVED_QTY', 'Received Quantity', 'Procurement', coalesce(total_received_quantity, 0)::numeric, 'Count'),
-        ('PO_REJECTED_QTY', 'Rejected Quantity', 'Procurement', coalesce(total_rejected_quantity, 0)::numeric, 'Count'),
-        ('PO_REJECTION_RATE', 'Rejection Rate', 'Procurement', coalesce(rejection_rate_percent, 0)::numeric, 'Percent'),
-        ('PO_FULFILLMENT_RATE', 'Fulfillment Rate', 'Procurement', coalesce(fulfillment_rate_percent, 0)::numeric, 'Percent'),
-        ('PO_DAYS_TO_SHIP', 'Purchase Days to Ship', 'Procurement', coalesce(days_to_ship, 0)::numeric, 'Days')
-) as metrics(metric_key, metric_name, metric_category, metric_value, metric_unit)
+        ('PO_AMOUNT', totaldue::numeric),
+        ('PO_SUBTOTAL', subtotal::numeric),
+        ('PO_TAX', taxamt::numeric),
+        ('PO_FREIGHT', freight::numeric),
+        ('PO_QUANTITY', coalesce(total_quantity, 0)::numeric),
+        ('PO_RECEIVED_QTY', coalesce(total_received_quantity, 0)::numeric),
+        ('PO_REJECTED_QTY', coalesce(total_rejected_quantity, 0)::numeric),
+        ('PO_REJECTION_RATE', coalesce(rejection_rate_percent, 0)::numeric),
+        ('PO_FULFILLMENT_RATE', coalesce(fulfillment_rate_percent, 0)::numeric),
+        ('PO_DAYS_TO_SHIP', coalesce(days_to_ship, 0)::numeric)
+) as metrics(metric_key, metric_value)
 where metric_value is not null

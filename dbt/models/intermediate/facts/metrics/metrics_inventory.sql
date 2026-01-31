@@ -6,12 +6,9 @@
     Extracts metrics from fact_inventory (product/location granularity)
     
     Metrics included:
-    - INV_QUANTITY: Current inventory quantity
-    - INV_VALUE: Inventory value (quantity * cost)
-    - INV_ABOVE_SAFETY: Quantity above safety stock level
-    - INV_REORDER_PCT: Percentage of reorder point
+    - INV_QUANTITY, INV_VALUE, INV_ABOVE_SAFETY, INV_REORDER_PCT
     
-    Relevant dimensions: product, location, inventory_status
+    Note: metric_name, metric_category, and metric_unit come from dim_metric (single source of truth)
 #}
 
 with report_date_calc as (
@@ -39,16 +36,13 @@ select
     
     -- Metric columns
     metric_key,
-    metric_name,
-    metric_category,
-    metric_value,
-    metric_unit
+    metric_value
 from {{ ref('fact_inventory') }}
 cross join lateral (
     values
-        ('INV_QUANTITY', 'Inventory Quantity', 'Inventory', quantity::numeric, 'Count'),
-        ('INV_VALUE', 'Inventory Value', 'Inventory', coalesce(inventory_value, 0)::numeric, 'USD'),
-        ('INV_ABOVE_SAFETY', 'Quantity Above Safety Stock', 'Inventory', coalesce(quantity_above_safety_stock, 0)::numeric, 'Count'),
-        ('INV_REORDER_PCT', 'Reorder Point Percentage', 'Inventory', coalesce(reorder_point_percentage, 0)::numeric, 'Percent')
-) as metrics(metric_key, metric_name, metric_category, metric_value, metric_unit)
+        ('INV_QUANTITY', quantity::numeric),
+        ('INV_VALUE', coalesce(inventory_value, 0)::numeric),
+        ('INV_ABOVE_SAFETY', coalesce(quantity_above_safety_stock, 0)::numeric),
+        ('INV_REORDER_PCT', coalesce(reorder_point_percentage, 0)::numeric)
+) as metrics(metric_key, metric_value)
 where metric_value is not null

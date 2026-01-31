@@ -4,30 +4,42 @@ models:
   # ============================================
   # METRICS BUILDING BLOCKS
   # ============================================
-  # These models extract metrics from fact tables in a lean format.
-  # Each model only includes columns relevant to its metrics.
-  # fact_global_metrics handles column alignment and 'All' defaults.
+  # These views extract metrics from fact tables in a lean format.
+  # Each model only includes metric_key, metric_value, and relevant dimension columns.
+  # 
+  # metric_name, metric_category, metric_unit, and metric_level come from dim_metric
+  # (single source of truth). fact_global_metrics handles the join and column alignment.
   
   - name: metrics_sales_order
     description: |
-      Sales order metrics extracted from fact_sales_order.
-      Granularity: One row per metric per sales order.
+      Sales order metrics from fact_sales_order (order-level granularity).
+      One row per metric per sales order.
       
-      Metrics: SO_REVENUE, SO_SUBTOTAL, SO_TAX, SO_FREIGHT, SO_QUANTITY, 
-               SO_LINE_ITEMS, SO_DISCOUNT, SO_DAYS_TO_SHIP
+      Metrics: SO_REVENUE, SO_SUBTOTAL, SO_TAX, SO_FREIGHT, 
+               SO_QUANTITY, SO_LINE_ITEMS, SO_DISCOUNT, SO_DAYS_TO_SHIP
     columns:
       - name: date_key
         description: "Order date key (YYYYMMDD format)"
+      - name: report_date
+        description: "Max transaction date (snapshot date)"
+      - name: source_table
+        description: "Always 'sales_order'"
+      - name: source_record_id
+        description: "salesorderid from fact_sales_order"
+      - name: metric_key
+        description: "Metric identifier (joins to dim_metric)"
+      - name: metric_value
+        description: "Numeric metric value"
       - name: customer_key
-        description: "Foreign key to dim_customer"
+        description: "FK to dim_customer"
       - name: employee_key
-        description: "Foreign key to dim_employee"
+        description: "FK to dim_employee"
       - name: territory_key
-        description: "Foreign key to dim_territory"
+        description: "FK to dim_territory"
       - name: ship_method_key
-        description: "Foreign key to ship method"
+        description: "FK to ship method"
       - name: credit_card_key
-        description: "Foreign key to credit card"
+        description: "FK to credit card"
       - name: online_order_flag
         description: "'Online' or 'In-Store'"
       - name: order_status
@@ -35,55 +47,75 @@ models:
 
   - name: metrics_sales_line
     description: |
-      Sales line item metrics extracted from fact_sales_order_line.
-      Granularity: One row per metric per line item.
+      Sales line metrics from fact_sales_order_line (line-item granularity).
+      One row per metric per line item.
       
       Metrics: SOL_REVENUE, SOL_GROSS_AMOUNT, SOL_QUANTITY, SOL_PROFIT,
                SOL_PROFIT_MARGIN, SOL_DISCOUNT, SOL_UNIT_PRICE
     columns:
       - name: date_key
         description: "Order date key (YYYYMMDD format)"
+      - name: report_date
+        description: "Max transaction date (snapshot date)"
+      - name: source_table
+        description: "Always 'sales_order_line'"
+      - name: source_record_id
+        description: "salesorderdetailid from fact_sales_order_line"
+      - name: metric_key
+        description: "Metric identifier (joins to dim_metric)"
+      - name: metric_value
+        description: "Numeric metric value"
       - name: customer_key
-        description: "Foreign key to dim_customer"
+        description: "FK to dim_customer"
       - name: product_key
-        description: "Foreign key to dim_product"
+        description: "FK to dim_product"
       - name: employee_key
-        description: "Foreign key to dim_employee"
+        description: "FK to dim_employee"
       - name: territory_key
-        description: "Foreign key to dim_territory"
+        description: "FK to dim_territory"
       - name: special_offer_key
-        description: "Foreign key to special offer"
+        description: "FK to special offer"
       - name: parent_order_id
-        description: "Reference to parent sales order"
+        description: "Parent sales order ID"
       - name: has_discount
         description: "'Yes' or 'No'"
 
   - name: metrics_inventory
     description: |
-      Inventory metrics extracted from fact_inventory.
-      Granularity: One row per metric per product/location.
+      Inventory metrics from fact_inventory (product/location granularity).
+      One row per metric per product/location combination.
       
       Metrics: INV_QUANTITY, INV_VALUE, INV_ABOVE_SAFETY, INV_REORDER_PCT
     columns:
       - name: date_key
-        description: "Report date key (snapshot date)"
+        description: "Report date key (YYYYMMDD format)"
+      - name: report_date
+        description: "Snapshot date"
+      - name: source_table
+        description: "Always 'inventory'"
+      - name: source_record_id
+        description: "Row number for product/location"
+      - name: metric_key
+        description: "Metric identifier (joins to dim_metric)"
+      - name: metric_value
+        description: "Numeric metric value"
       - name: product_key
-        description: "Foreign key to dim_product"
+        description: "FK to dim_product"
       - name: location_key
         description: "Location identifier"
       - name: inventory_status
         description: "'In Stock', 'Out of Stock', 'Below Safety Stock', 'At Reorder Point'"
       - name: location_name
-        description: "Name of the inventory location"
+        description: "Inventory location name"
       - name: safety_stock_level
-        description: "Safety stock level threshold"
+        description: "Safety stock threshold"
       - name: reorder_point
         description: "Reorder point threshold"
 
   - name: metrics_purchase_order
     description: |
-      Purchase order metrics extracted from fact_purchase_order.
-      Granularity: One row per metric per purchase order.
+      Purchase order metrics from fact_purchase_order (order-level granularity).
+      One row per metric per purchase order.
       
       Metrics: PO_AMOUNT, PO_SUBTOTAL, PO_TAX, PO_FREIGHT, PO_QUANTITY,
                PO_RECEIVED_QTY, PO_REJECTED_QTY, PO_REJECTION_RATE,
@@ -91,19 +123,29 @@ models:
     columns:
       - name: date_key
         description: "Order date key (YYYYMMDD format)"
+      - name: report_date
+        description: "Max transaction date (snapshot date)"
+      - name: source_table
+        description: "Always 'purchase_order'"
+      - name: source_record_id
+        description: "purchaseorderid from fact_purchase_order"
+      - name: metric_key
+        description: "Metric identifier (joins to dim_metric)"
+      - name: metric_value
+        description: "Numeric metric value"
       - name: vendor_key
-        description: "Foreign key to dim_vendor"
+        description: "FK to dim_vendor"
       - name: employee_key
-        description: "Foreign key to dim_employee"
+        description: "FK to dim_employee"
       - name: ship_method_key
-        description: "Foreign key to ship method"
+        description: "FK to ship method"
       - name: order_status
         description: "Purchase order status code"
 
   - name: metrics_work_order
     description: |
-      Work order metrics extracted from fact_work_order.
-      Granularity: One row per metric per work order.
+      Work order metrics from fact_work_order (work order granularity).
+      One row per metric per work order.
       
       Metrics: WO_ORDER_QTY, WO_GOOD_QTY, WO_SCRAPPED_QTY, WO_SCRAP_RATE,
                WO_PLANNED_COST, WO_ACTUAL_COST, WO_COST_VARIANCE,
@@ -112,10 +154,20 @@ models:
     columns:
       - name: date_key
         description: "Start date key (YYYYMMDD format)"
+      - name: report_date
+        description: "Max transaction date (snapshot date)"
+      - name: source_table
+        description: "Always 'work_order'"
+      - name: source_record_id
+        description: "workorderid from fact_work_order"
+      - name: metric_key
+        description: "Metric identifier (joins to dim_metric)"
+      - name: metric_value
+        description: "Numeric metric value"
       - name: product_key
-        description: "Foreign key to dim_product"
+        description: "FK to dim_product"
       - name: scrap_reason_key
-        description: "Foreign key to scrap reason"
+        description: "FK to scrap reason"
       - name: delivery_status
         description: "'On Time', 'Slightly Late', 'Late'"
       - name: scrap_reason_name
@@ -125,19 +177,29 @@ models:
 
   - name: metrics_employee_quota
     description: |
-      Employee quota metrics extracted from fact_employee_quota.
-      Granularity: One row per metric per employee/quota period.
+      Employee quota metrics from fact_employee_quota (employee/period granularity).
+      One row per metric per employee quota period.
       
       Metrics: EQ_QUOTA, EQ_SALES_YTD, EQ_SALES_LAST_YEAR,
                EQ_ACHIEVEMENT_PCT, EQ_QUOTA_VARIANCE, EQ_BONUS
     columns:
       - name: date_key
         description: "Quota date key (YYYYMMDD format)"
+      - name: report_date
+        description: "Max transaction date (snapshot date)"
+      - name: source_table
+        description: "Always 'employee_quota'"
+      - name: source_record_id
+        description: "employee_key (one quota per employee)"
+      - name: metric_key
+        description: "Metric identifier (joins to dim_metric)"
+      - name: metric_value
+        description: "Numeric metric value"
       - name: employee_key
-        description: "Foreign key to dim_employee"
+        description: "FK to dim_employee"
       - name: territory_key
-        description: "Foreign key to dim_territory"
+        description: "FK to dim_territory"
       - name: quota_status
         description: "'Achieved', 'Near Target', 'Below Target'"
       - name: commission_pct
-        description: "Commission percentage for the employee"
+        description: "Commission percentage"

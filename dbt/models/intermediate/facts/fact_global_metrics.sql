@@ -9,6 +9,9 @@
     Each UNION ALL section explicitly maps columns from source metrics models,
     using 'All' for dimension columns not applicable to that metric type.
     
+    metric_name, metric_category, metric_unit, and metric_level are pulled from dim_metric 
+    (single source of truth) after the union, ensuring consistency across all metrics.
+    
     This enables:
     - Flexible cross-domain analytics
     - Consistent metric definitions
@@ -55,10 +58,7 @@ with all_metrics as (
         cast(null as numeric) as commission_pct,
         -- Metric columns
         metric_key,
-        metric_name,
-        metric_category,
-        metric_value,
-        metric_unit
+        metric_value
     from {{ ref('metrics_sales_order') }}
     
     union all
@@ -100,10 +100,7 @@ with all_metrics as (
         cast(null as numeric) as commission_pct,
         -- Metric columns
         metric_key,
-        metric_name,
-        metric_category,
-        metric_value,
-        metric_unit
+        metric_value
     from {{ ref('metrics_sales_line') }}
     
     union all
@@ -145,10 +142,7 @@ with all_metrics as (
         cast(null as numeric) as commission_pct,
         -- Metric columns
         metric_key,
-        metric_name,
-        metric_category,
-        metric_value,
-        metric_unit
+        metric_value
     from {{ ref('metrics_inventory') }}
     
     union all
@@ -190,10 +184,7 @@ with all_metrics as (
         cast(null as numeric) as commission_pct,
         -- Metric columns
         metric_key,
-        metric_name,
-        metric_category,
-        metric_value,
-        metric_unit
+        metric_value
     from {{ ref('metrics_purchase_order') }}
     
     union all
@@ -235,10 +226,7 @@ with all_metrics as (
         cast(null as numeric) as commission_pct,
         -- Metric columns
         metric_key,
-        metric_name,
-        metric_category,
-        metric_value,
-        metric_unit
+        metric_value
     from {{ ref('metrics_work_order') }}
     
     union all
@@ -280,58 +268,67 @@ with all_metrics as (
         commission_pct,
         -- Metric columns
         metric_key,
-        metric_name,
-        metric_category,
-        metric_value,
-        metric_unit
+        metric_value
     from {{ ref('metrics_employee_quota') }}
 )
 
 select
     -- Surrogate key
-    row_number() over (order by date_key, metric_key, source_record_id) as metric_record_id,
+    row_number() over (order by am.date_key, am.metric_key, am.source_record_id) as metric_record_id,
     
-    -- All columns from union
-    date_key,
-    report_date,
-    metric_key,
-    metric_name,
-    metric_category,
-    source_table,
-    source_record_id,
+    -- Date columns
+    am.date_key,
+    am.report_date,
+    
+    -- Metric info from dim_metric (single source of truth)
+    am.metric_key,
+    dm.metric_name,
+    dm.metric_category,
+    dm.metric_unit,
+    dm.metric_level,
+    
+    -- Source info
+    am.source_table,
+    am.source_record_id,
+    
     -- Core dimension keys
-    customer_key,
-    product_key,
-    employee_key,
-    territory_key,
-    vendor_key,
-    location_key,
+    am.customer_key,
+    am.product_key,
+    am.employee_key,
+    am.territory_key,
+    am.vendor_key,
+    am.location_key,
+    
     -- Additional dimension keys
-    ship_method_key,
-    credit_card_key,
-    special_offer_key,
-    scrap_reason_key,
-    parent_order_id,
+    am.ship_method_key,
+    am.credit_card_key,
+    am.special_offer_key,
+    am.scrap_reason_key,
+    am.parent_order_id,
+    
     -- Status columns
-    online_order_flag,
-    has_discount,
-    inventory_status,
-    order_status,
-    delivery_status,
-    quota_status,
+    am.online_order_flag,
+    am.has_discount,
+    am.inventory_status,
+    am.order_status,
+    am.delivery_status,
+    am.quota_status,
+    
     -- Context columns
-    location_name,
-    scrap_reason_name,
-    safety_stock_level,
-    reorder_point,
-    number_of_operations,
-    commission_pct,
+    am.location_name,
+    am.scrap_reason_name,
+    am.safety_stock_level,
+    am.reorder_point,
+    am.number_of_operations,
+    am.commission_pct,
+    
     -- Metric value
-    metric_value,
-    metric_unit,
+    am.metric_value,
+    
     -- Metadata
     current_timestamp as created_at
 
-from all_metrics
-where metric_value is not null
-  and metric_value != 0
+from all_metrics am
+left join {{ ref('dim_metric') }} dm on am.metric_key = dm.metric_key
+where am.metric_value is not null
+  and am.metric_value != 0
