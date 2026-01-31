@@ -12,28 +12,50 @@ Natural Language to SQL analytics powered by LLMs (OpenAI GPT-4 or Anthropic Cla
 
 ## Setup
 
-### 1. Install Dependencies
+### 1. Get an OpenAI API Key
+
+1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Create an account or sign in
+3. Click **"Create new secret key"**
+4. Copy the key (starts with `sk-`)
+
+### 2. Install Dependencies
 
 ```bash
 cd streamlit
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Set API Key
+### 3. Configure Your API Key
 
-Choose one provider and set the environment variable:
+Create a `.env` file in the `streamlit/` directory:
 
-**Option A: OpenAI (GPT-4)**
 ```bash
-export OPENAI_API_KEY="your-openai-api-key"
+# Create .env file with your API key
+cat > .env << 'EOF'
+OPENAI_API_KEY=sk-proj-your-actual-key-here
+EOF
 ```
 
-**Option B: Anthropic (Claude)**
-```bash
-export ANTHROPIC_API_KEY="your-anthropic-api-key"
+Or manually create `streamlit/.env`:
+
+```env
+# Required: Your OpenAI API key
+OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxx
+
+# Optional: Use a different model (default: gpt-4o)
+# OPENAI_MODEL=gpt-4o-mini  # Cheaper option
 ```
 
-You can also enter the API key directly in the Streamlit sidebar.
+> ⚠️ **Security:** The `.env` file is in `.gitignore` and will NOT be committed to Git.
+
+**Alternative: Anthropic Claude**
+```env
+ANTHROPIC_API_KEY=sk-ant-your-anthropic-api-key
+```
+
+You can also enter the API key directly in the Streamlit sidebar if not using `.env`.
 
 ### 3. Run the Dashboard
 

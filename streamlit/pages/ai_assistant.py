@@ -11,26 +11,33 @@ from datetime import datetime
 import os
 import sys
 
+# Get the streamlit directory path (parent of pages/)
+STREAMLIT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Add streamlit directory to path for imports (must be before ai imports)
+if STREAMLIT_DIR not in sys.path:
+    sys.path.insert(0, STREAMLIT_DIR)
+
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
-    # Load from streamlit directory first, then project root
-    env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+    env_path = os.path.join(STREAMLIT_DIR, '.env')
     load_dotenv(env_path)
 except ImportError:
     pass  # python-dotenv not installed, rely on system environment variables
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from pages.utils import format_dataframe
 
 # Import AI modules
+AI_AVAILABLE = False
+AI_IMPORT_ERROR = ""
+
 try:
-    from ai import SQLGenerator, ResultVisualizer, SQLValidator
+    from ai.sql_generator import SQLGenerator
+    from ai.visualizer import ResultVisualizer
+    from ai.sql_validator import SQLValidator
     AI_AVAILABLE = True
 except ImportError as e:
-    AI_AVAILABLE = False
     AI_IMPORT_ERROR = str(e)
 
 

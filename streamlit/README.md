@@ -77,10 +77,14 @@ See `requirements.txt` for package dependencies:
 - `numpy` - Numerical computing
 - `psycopg2-binary` - PostgreSQL database connector
 - `plotly` - Interactive visualizations
+- `openai` - OpenAI GPT API for AI Assistant
+- `anthropic` - Anthropic Claude API (alternative to OpenAI)
+- `python-dotenv` - Environment variable management
 
 ## Features
 
 - Multi-page analytics dashboard
+- **🤖 AI Analytics Assistant** - Natural language queries powered by GPT-4
 - Sales & Revenue Analytics
 - Product & Inventory Analytics
 - Customer Analytics
@@ -90,6 +94,63 @@ See `requirements.txt` for package dependencies:
 - Interactive charts and visualizations
 - Data tables with download functionality
 - Sidebar configuration and filters
+
+## AI Assistant Setup
+
+The AI Analytics Assistant allows you to query your data using natural language (e.g., "What is our revenue by territory?").
+
+### 1. Get an OpenAI API Key
+
+1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Create an account or sign in
+3. Click "Create new secret key"
+4. Copy the key (starts with `sk-`)
+
+### 2. Configure Your API Key
+
+Create a `.env` file in the `streamlit/` directory:
+
+```bash
+cd streamlit
+cat > .env << 'EOF'
+OPENAI_API_KEY=sk-proj-your-actual-key-here
+EOF
+```
+
+Or manually create `streamlit/.env`:
+
+```env
+OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+> ⚠️ **Security Note:** The `.env` file is already in `.gitignore` and will NOT be committed to Git.
+
+### 3. Install AI Dependencies
+
+```bash
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 4. Use the AI Assistant
+
+1. Start the dashboard: `streamlit run app.py`
+2. Navigate to **🤖 AI Assistant** in the sidebar
+3. Ask questions like:
+   - "What is our total revenue by territory?"
+   - "Show me top 10 customers by lifetime value"
+   - "Which products have the highest profit margin?"
+
+### Cost Estimate
+
+Using GPT-4o (default): ~$0.007 per query (~$21/month for 100 queries/day)
+
+To use a cheaper model, add to your `.env`:
+
+```env
+OPENAI_API_KEY=sk-proj-your-key
+OPENAI_MODEL=gpt-4o-mini  # ~$0.0004 per query
+```
 
 ## Adding Dependencies
 

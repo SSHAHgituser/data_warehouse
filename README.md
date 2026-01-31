@@ -5,8 +5,9 @@ A modern data stack that can be quickly deployed and is ready to scale. This rep
 - **PostgreSQL**: Database and storage
 - **Adventure Works**: Sample dataset from Microsoft
 - **dbt Core**: Data transformation
-- **Streamlit**: Interactive dashboards
+- **Streamlit**: Interactive dashboards with **AI Analytics Assistant**
 - **Airbyte**: Extract and Load (via `abctl` - see [Airbyte Setup](#airbyte-setup))
+- **AI Assistant**: Natural language queries powered by OpenAI GPT-4 (see [AI Setup](#ai-assistant-setup))
 
 ## Quick Start
 
@@ -283,12 +284,47 @@ data_warehouse/
     └── troubleshooting.md      # Troubleshooting guide
 ```
 
+## AI Assistant Setup
+
+The Streamlit dashboard includes an **AI Analytics Assistant** that lets you query your data using natural language (e.g., "What is our revenue by territory?").
+
+### 1. Get an OpenAI API Key
+
+1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Create an account or sign in
+3. Click **"Create new secret key"**
+4. Copy the key (starts with `sk-`)
+
+### 2. Configure Your API Key
+
+Create a `.env` file in the `streamlit/` directory:
+
+```bash
+cd streamlit
+cat > .env << 'EOF'
+OPENAI_API_KEY=sk-proj-your-actual-key-here
+EOF
+```
+
+> ⚠️ **Security:** The `.env` file is already in `.gitignore` and will NOT be committed to Git.
+
+### 3. Use the AI Assistant
+
+1. Start the dashboard: `http://localhost:8501`
+2. Navigate to **🤖 AI Assistant** in the sidebar
+3. Ask questions in plain English!
+
+For more details, see [streamlit/ai/README.md](streamlit/ai/README.md).
+
+---
+
 ## Component Documentation
 
 Each component has its own README with component-specific details:
 
 - **[dbt/README.md](dbt/README.md)** - dbt project setup, local development, and usage
 - **[streamlit/README.md](streamlit/README.md)** - Streamlit dashboard development
+- **[streamlit/ai/README.md](streamlit/ai/README.md)** - AI Analytics Assistant setup
 - **[adventureworks/README.md](adventureworks/README.md)** - AdventureWorks database installation
 - **[airbyte/README.md](airbyte/README.md)** - Airbyte setup and troubleshooting
 

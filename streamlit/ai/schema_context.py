@@ -3,10 +3,20 @@ Schema Context Loader
 =====================
 Loads semantic context from the data warehouse for LLM prompting.
 Uses dim_metric as the single source of truth for metric definitions.
+Dynamically loads dbt model YAML files for comprehensive schema context.
 """
 
+import os
 import pandas as pd
 from typing import Optional
+from pathlib import Path
+
+# Try to import yaml for loading dbt schema files
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
 
 
 class SchemaContext:
@@ -22,6 +32,10 @@ class SchemaContext:
         self.conn = conn
         self._metrics_cache: Optional[pd.DataFrame] = None
         self._tables_cache: Optional[dict] = None
+        self._yaml_schemas_cache: Optional[dict] = None
+        
+        # Path to dbt models directory (relative to streamlit/)
+        self.dbt_models_path = Path(__file__).parent.parent.parent / 'dbt' / 'models'
     
     def get_metrics_catalog(self) -> pd.DataFrame:
         """
@@ -55,9 +69,50 @@ class SchemaContext:
             # Return empty DataFrame if table doesn't exist
             return pd.DataFrame()
     
+    def load_yaml_schemas(self) -> dict:
+        """
+        Load all _schema.yml files from dbt models directory.
+        
+        Returns:
+            Dictionary mapping model names to their schema definitions
+        """
+        if self._yaml_schemas_cache is not None:
+            return self._yaml_schemas_cache
+        
+        if not YAML_AVAILABLE:
+            return {}
+        
+        schemas = {}
+        
+        # Find all schema.yml files
+        schema_files = [
+            self.dbt_models_path / 'marts' / '_schema.yml',
+            self.dbt_models_path / 'intermediate' / '_schema.yml',
+            self.dbt_models_path / 'intermediate' / 'facts' / 'metrics' / '_metrics_schema.yml',
+        ]
+        
+        for schema_file in schema_files:
+            if schema_file.exists():
+                try:
+                    with open(schema_file, 'r') as f:
+                        content = yaml.safe_load(f)
+                        if content and 'models' in content:
+                            for model in content['models']:
+                                model_name = model.get('name', '')
+                                if model_name:
+                                    schemas[model_name] = {
+                                        'description': model.get('description', ''),
+                                        'columns': model.get('columns', [])
+                                    }
+                except Exception as e:
+                    continue
+        
+        self._yaml_schemas_cache = schemas
+        return schemas
+    
     def get_table_schemas(self) -> dict:
         """
-        Get schema information for key tables.
+        Get comprehensive schema information from YAML files.
         
         Returns:
             Dictionary with table names and their column information
@@ -65,95 +120,63 @@ class SchemaContext:
         if self._tables_cache is not None:
             return self._tables_cache
         
-        tables = {
-            'mart_sales': """
-                Main sales mart with all dimensions joined.
-                Key columns:
-                - salesorderid, salesorderdetailid: Order identifiers
-                - order_date, order_year, order_month, order_season: Time dimensions
-                - customer_key, customer_name, customer_segment, customer_status: Customer info
-                - product_key, product_name, category_name, subcategory_name: Product info
-                - territory_key, territory_name, countryregioncode, territory_group: Geography
-                - employee_key, salesperson_name: Sales rep info
-                - order_total, net_line_amount, total_profit: Financial metrics
-                - orderqty, unitprice, unitpricediscount: Line item details
-                - has_discount, online_order_flag, shipping_speed_category: Order attributes
-            """,
-            'mart_customer_analytics': """
-                Customer analytics with CLV, RFM, and churn prediction.
-                Key columns:
-                - customerid, customer_name, email_address: Customer identity
-                - customer_segment (High/Medium/Low Value), customer_status (Active/At Risk/Inactive)
-                - lifetime_value, order_count, avg_order_value: Purchase metrics
-                - days_since_last_order, first_order_date, last_order_date: Recency
-                - rfm_score, rfm_segment, rfm_category: RFM analysis
-                - churn_risk (High/Medium/Low): Churn prediction
-                - cohort_period: Customer acquisition cohort
-            """,
-            'mart_product_analytics': """
-                Product analytics with profitability and inventory metrics.
-                Key columns:
-                - productid, product_name, category_name, subcategory_name: Product info
-                - total_revenue, total_quantity_sold, profit_margin_percent: Sales metrics
-                - inventory_status, current_inventory, safety_stock_level: Inventory
-                - monthly_sales_velocity, inventory_turnover_ratio: Performance
-                - top_related_product_id, co_purchase_count: Market basket
-                - product_lifecycle_stage: Lifecycle analysis
-            """,
-            'mart_operations': """
-                Operations mart combining purchase orders and work orders.
-                Key columns:
-                - operation_type (purchase_order/work_order): Operation category
-                - operation_id, operation_date: Identifiers
-                - vendor_key, vendor_name: Vendor info (for POs)
-                - product_key, product_name: Product info
-                - total_amount, cost_variance: Financial metrics
-                - rejection_rate_percent, fulfillment_rate_percent: Quality metrics
-                - scrap_rate_percent, production_days: Production metrics
-            """,
-            'mart_employee_territory_performance': """
-                Employee and territory performance tracking.
-                Key columns:
-                - performance_type (employee/territory): Record type
-                - performance_id, performance_name: Identifiers
-                - monthly_revenue, total_revenue: Sales metrics
-                - quota_amount, quota_achievement_percent, quota_status: Quota tracking
-                - territory_name, territory_group: Territory info
-            """,
-            'fact_global_metrics': """
-                Unified metrics fact table in "tall" format.
-                Key columns:
-                - metric_key: Links to dim_metric for metric definitions
-                - metric_value: The numeric value
-                - date_key, report_date: Time dimensions
-                - customer_key, product_key, employee_key, territory_key, vendor_key: Dimension keys
-                - metric_category, metric_unit, metric_level: From dim_metric
-                Use this table for cross-domain metric analysis and time series.
-            """,
-            'dim_customer': """
-                Customer dimension with segmentation.
-                Key columns: customerid, customer_name, lifetime_value, customer_segment, customer_status
-            """,
-            'dim_product': """
-                Product dimension with category hierarchy.
-                Key columns: productid, product_name, category_name, subcategory_name, product_status
-            """,
-            'dim_territory': """
-                Sales territory dimension.
-                Key columns: territoryid, territory_name, countryregioncode, territory_group, total_revenue
-            """,
-            'dim_date': """
-                Date dimension for time-based analysis.
-                Key columns: date_key (YYYYMMDD), date_day, year, quarter, month, day_of_week, season
-            """,
-            'dim_metric': """
-                Metrics catalog - single source of truth for all metric definitions.
-                Key columns: metric_key, metric_name, metric_description, metric_category, metric_unit, metric_level
-            """
-        }
+        # Load YAML schemas
+        yaml_schemas = self.load_yaml_schemas()
+        
+        tables = {}
+        
+        # Priority tables to include (marts and key dimensions/facts)
+        priority_tables = [
+            'mart_sales', 'mart_customer_analytics', 'mart_product_analytics',
+            'mart_operations', 'mart_employee_territory_performance',
+            'fact_global_metrics', 'fact_sales_order', 'fact_sales_order_line',
+            'fact_inventory', 'fact_purchase_order', 'fact_work_order',
+            'fact_employee_quota', 'dim_customer', 'dim_product', 'dim_date',
+            'dim_employee', 'dim_territory', 'dim_vendor', 'dim_metric'
+        ]
+        
+        for table_name in priority_tables:
+            if table_name in yaml_schemas:
+                schema = yaml_schemas[table_name]
+                desc = schema['description']
+                columns = schema['columns']
+                
+                # Build column descriptions
+                col_desc = []
+                for col in columns:
+                    col_name = col.get('name', '')
+                    col_description = col.get('description', '')
+                    if col_name:
+                        col_desc.append(f"  - {col_name}: {col_description}")
+                
+                tables[table_name] = f"""{desc}
+
+Columns:
+{chr(10).join(col_desc)}"""
+            else:
+                # Fallback for tables not in YAML
+                tables[table_name] = self._get_fallback_schema(table_name)
         
         self._tables_cache = tables
         return tables
+    
+    def _get_fallback_schema(self, table_name: str) -> str:
+        """Get fallback schema for tables not in YAML files."""
+        fallback_schemas = {
+            'mart_sales': """
+                Main sales mart with all dimensions joined.
+                Key columns: salesorderid, order_date, customer_key, product_key, territory_key, order_total, net_line_amount
+            """,
+            'mart_customer_analytics': """
+                Customer analytics with CLV, RFM, and churn prediction.
+                Key columns: customerid, customer_name, lifetime_value, customer_segment, churn_risk, rfm_category
+            """,
+            'mart_product_analytics': """
+                Product analytics with profitability and inventory metrics.
+                Key columns: productid, product_name, category_name, total_revenue, profit_margin_percent
+            """,
+        }
+        return fallback_schemas.get(table_name, f"Table: {table_name}")
     
     def get_example_queries(self) -> list:
         """
@@ -219,6 +242,33 @@ FROM mart_sales
 WHERE category_name IS NOT NULL
 GROUP BY category_name, order_year
 ORDER BY category_name, order_year"""
+            ),
+            (
+                "What are our top selling products?",
+                """SELECT product_name, category_name, SUM(orderqty) as total_quantity, SUM(net_line_amount) as total_revenue
+FROM mart_sales
+WHERE product_name IS NOT NULL
+GROUP BY product_name, category_name
+ORDER BY total_revenue DESC
+LIMIT 10"""
+            ),
+            (
+                "Show employee quota achievement",
+                """SELECT performance_name, quota_achievement_percent, quota_status, monthly_revenue
+FROM mart_employee_territory_performance
+WHERE performance_type = 'employee'
+ORDER BY quota_achievement_percent DESC"""
+            ),
+            (
+                "What is our inventory status by category?",
+                """SELECT p.category_name, 
+       SUM(i.quantity) as total_quantity,
+       SUM(i.inventory_value) as total_value,
+       COUNT(CASE WHEN i.inventory_status = 'Out of Stock' THEN 1 END) as out_of_stock_count
+FROM fact_inventory i
+JOIN dim_product p ON i.product_key = p.productid
+GROUP BY p.category_name
+ORDER BY total_value DESC"""
             )
         ]
     
@@ -240,13 +290,13 @@ ORDER BY category_name, order_year"""
             for category, group in metrics_by_category:
                 metrics_context += f"\n### {category} Metrics:\n"
                 for _, row in group.iterrows():
-                    metrics_context += f"- {row['metric_key']}: {row['metric_name']} ({row['metric_unit']}) - {row['metric_description'][:100]}...\n"
+                    desc = str(row['metric_description'])[:100] if row['metric_description'] else ''
+                    metrics_context += f"- {row['metric_key']}: {row['metric_name']} ({row['metric_unit']}) - {desc}...\n"
         
-        # Build table context
-        tables_context = "\n".join([
-            f"### {table}\n{desc.strip()}\n"
-            for table, desc in tables.items()
-        ])
+        # Build table context with full column details
+        tables_context = ""
+        for table, desc in tables.items():
+            tables_context += f"\n### {table}\n{desc.strip()}\n"
         
         # Build examples context
         examples_context = "\n\n".join([
@@ -257,9 +307,7 @@ ORDER BY category_name, order_year"""
         return f"""You are a SQL expert for the AdventureWorks data warehouse running on PostgreSQL.
 Your job is to convert natural language questions into accurate SQL queries.
 
-## Database Schema
-
-### Available Tables:
+## Database Schema (with column descriptions)
 {tables_context}
 
 ## Available Metrics (from dim_metric):
@@ -267,14 +315,17 @@ Your job is to convert natural language questions into accurate SQL queries.
 
 ## Important Rules:
 1. ONLY generate SELECT queries - no INSERT, UPDATE, DELETE, DROP, or any DDL
-2. Always use table aliases for clarity
+2. Always use table aliases for clarity when joining tables
 3. Use appropriate aggregations (SUM, AVG, COUNT, etc.) for metrics
 4. Include ORDER BY for sorted results
 5. Use LIMIT for top-N queries (default to 10-20 for large result sets)
 6. Handle NULL values appropriately with COALESCE or WHERE filters
 7. Use proper date filtering for time-based queries
-8. Join tables only when necessary - prefer using marts which are pre-joined
-9. Format column names to be human-readable in output
+8. Prefer using mart tables (mart_sales, mart_customer_analytics, etc.) which have pre-joined dimensions
+9. Format column names to be human-readable in output using AS aliases
+10. For time series queries, use order_year and order_month columns in mart_sales
+11. Use customer_segment, customer_status, churn_risk columns for customer analysis
+12. Use category_name, subcategory_name for product analysis
 
 ## Example Queries:
 {examples_context}
@@ -294,13 +345,25 @@ If the question cannot be answered with the available data, respond with:
         """
         return """Available tables: mart_sales, mart_customer_analytics, mart_product_analytics, 
 mart_operations, mart_employee_territory_performance, fact_global_metrics, 
-dim_customer, dim_product, dim_territory, dim_date, dim_metric.
+dim_customer, dim_product, dim_territory, dim_date, dim_metric, dim_employee, dim_vendor,
+fact_sales_order, fact_sales_order_line, fact_inventory, fact_purchase_order, fact_work_order.
 
-Key fields:
-- Revenue/Sales: order_total, net_line_amount, total_revenue, lifetime_value
-- Time: order_date, order_year, order_month, order_season, date_key
-- Customer: customer_name, customer_segment, customer_status, churn_risk
-- Product: product_name, category_name, subcategory_name
-- Geography: territory_name, countryregioncode, territory_group
+Key fields in mart_sales:
+- salesorderid, salesorderdetailid: Order identifiers
+- order_date, order_year, order_month, order_season: Time dimensions  
+- customer_key, customer_name, customer_segment, customer_status: Customer info
+- product_key, product_name, category_name, subcategory_name: Product info
+- territory_key, territory_name, countryregioncode, territory_group: Geography
+- order_total, net_line_amount, total_profit: Financial metrics
+- orderqty, unitprice, unitpricediscount: Line item details
+
+Key fields in mart_customer_analytics:
+- customerid, customer_name, lifetime_value, order_count, avg_order_value
+- customer_segment, customer_status, churn_risk, rfm_category
+- days_since_last_order, first_order_date, last_order_date
+
+Key fields in mart_product_analytics:
+- productid, product_name, category_name, total_revenue, profit_margin_percent
+- inventory_status, monthly_sales_velocity, inventory_turnover_ratio
 
 Return ONLY the SQL query, no explanations."""
