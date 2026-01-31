@@ -185,3 +185,53 @@ models:
       - name: quota_status
         description: "Quota status (Achieved/Near Target/Below Target)"
 
+  - name: fact_global_metrics
+    description: |
+      Global metrics fact table consolidating all metrics from fact tables into a unified 'tall' format.
+      Each row represents one metric value with its associated dimensions.
+      
+      Supports:
+      - Cross-domain analytics and comparisons
+      - Flexible time-series analysis
+      - Consistent metric definitions
+      - Dynamic dashboards and reporting
+      
+      Source tables: fact_sales_order, fact_sales_order_line, fact_inventory, 
+                     fact_purchase_order, fact_work_order, fact_employee_quota
+    columns:
+      - name: metric_record_id
+        description: "Surrogate key - unique identifier for each metric record"
+      - name: date_key
+        description: "Date key in YYYYMMDD format - foreign key to dim_date"
+      - name: report_date
+        description: "Report date - the max transaction date across all data (snapshot date)"
+      - name: metric_key
+        description: "Unique metric identifier (e.g., SO_REVENUE, INV_QUANTITY, WO_SCRAP_RATE)"
+      - name: metric_name
+        description: "Human-readable metric name"
+      - name: metric_category
+        description: "Metric category: Sales, Inventory, Procurement, Production, HR"
+      - name: source_table
+        description: "Source fact table name"
+      - name: source_record_id
+        description: "Original record ID from source table"
+      - name: customer_key
+        description: "Foreign key to dim_customer (nullable)"
+      - name: product_key
+        description: "Foreign key to dim_product (nullable)"
+      - name: employee_key
+        description: "Foreign key to dim_employee (nullable)"
+      - name: territory_key
+        description: "Foreign key to dim_territory (nullable)"
+      - name: vendor_key
+        description: "Foreign key to dim_vendor (nullable)"
+      - name: location_key
+        description: "Foreign key to location (nullable)"
+      - name: additional_dimensions
+        description: "JSONB column with metric-specific additional dimensions"
+      - name: metric_value
+        description: "The numeric metric value"
+      - name: metric_unit
+        description: "Unit of measure: USD, Count, Percent, Days, Hours"
+      - name: created_at
+        description: "Timestamp when the record was created"

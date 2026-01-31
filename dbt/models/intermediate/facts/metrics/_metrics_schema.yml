@@ -1,0 +1,122 @@
+version: 2
+
+models:
+  # ============================================
+  # METRICS BUILDING BLOCKS
+  # ============================================
+  # These models extract metrics from fact tables in a standardized format.
+  # They are combined in fact_global_metrics for unified analytics.
+  
+  - name: metrics_sales_order
+    description: |
+      Sales order metrics extracted from fact_sales_order.
+      Granularity: One row per metric per sales order.
+      
+      Metrics: SO_REVENUE, SO_SUBTOTAL, SO_TAX, SO_FREIGHT, SO_QUANTITY, 
+               SO_LINE_ITEMS, SO_DISCOUNT, SO_DAYS_TO_SHIP
+    columns:
+      - name: date_key
+        description: "Order date key (YYYYMMDD format)"
+      - name: metric_key
+        description: "Unique metric identifier"
+      - name: metric_value
+        description: "The metric value"
+      - name: customer_key
+        description: "Foreign key to dim_customer"
+      - name: territory_key
+        description: "Foreign key to dim_territory"
+
+  - name: metrics_sales_line
+    description: |
+      Sales line item metrics extracted from fact_sales_order_line.
+      Granularity: One row per metric per line item.
+      
+      Metrics: SOL_REVENUE, SOL_GROSS_AMOUNT, SOL_QUANTITY, SOL_PROFIT,
+               SOL_PROFIT_MARGIN, SOL_DISCOUNT, SOL_UNIT_PRICE
+    columns:
+      - name: date_key
+        description: "Order date key (YYYYMMDD format)"
+      - name: metric_key
+        description: "Unique metric identifier"
+      - name: metric_value
+        description: "The metric value"
+      - name: customer_key
+        description: "Foreign key to dim_customer"
+      - name: product_key
+        description: "Foreign key to dim_product"
+
+  - name: metrics_inventory
+    description: |
+      Inventory metrics extracted from fact_inventory.
+      Granularity: One row per metric per product/location.
+      
+      Metrics: INV_QUANTITY, INV_VALUE, INV_ABOVE_SAFETY, INV_REORDER_PCT
+    columns:
+      - name: date_key
+        description: "Report date key (snapshot date)"
+      - name: metric_key
+        description: "Unique metric identifier"
+      - name: metric_value
+        description: "The metric value"
+      - name: product_key
+        description: "Foreign key to dim_product"
+      - name: location_key
+        description: "Location identifier"
+
+  - name: metrics_purchase_order
+    description: |
+      Purchase order metrics extracted from fact_purchase_order.
+      Granularity: One row per metric per purchase order.
+      
+      Metrics: PO_AMOUNT, PO_SUBTOTAL, PO_TAX, PO_FREIGHT, PO_QUANTITY,
+               PO_RECEIVED_QTY, PO_REJECTED_QTY, PO_REJECTION_RATE,
+               PO_FULFILLMENT_RATE, PO_DAYS_TO_SHIP
+    columns:
+      - name: date_key
+        description: "Order date key (YYYYMMDD format)"
+      - name: metric_key
+        description: "Unique metric identifier"
+      - name: metric_value
+        description: "The metric value"
+      - name: vendor_key
+        description: "Foreign key to dim_vendor"
+      - name: employee_key
+        description: "Foreign key to dim_employee"
+
+  - name: metrics_work_order
+    description: |
+      Work order metrics extracted from fact_work_order.
+      Granularity: One row per metric per work order.
+      
+      Metrics: WO_ORDER_QTY, WO_GOOD_QTY, WO_SCRAPPED_QTY, WO_SCRAP_RATE,
+               WO_PLANNED_COST, WO_ACTUAL_COST, WO_COST_VARIANCE,
+               WO_COST_VARIANCE_PCT, WO_PRODUCTION_DAYS, WO_ACTUAL_HOURS,
+               WO_HOURS_PER_UNIT
+    columns:
+      - name: date_key
+        description: "Start date key (YYYYMMDD format)"
+      - name: metric_key
+        description: "Unique metric identifier"
+      - name: metric_value
+        description: "The metric value"
+      - name: product_key
+        description: "Foreign key to dim_product"
+
+  - name: metrics_employee_quota
+    description: |
+      Employee quota metrics extracted from fact_employee_quota.
+      Granularity: One row per metric per employee/quota period.
+      
+      Metrics: EQ_QUOTA, EQ_SALES_YTD, EQ_SALES_LAST_YEAR,
+               EQ_ACHIEVEMENT_PCT, EQ_QUOTA_VARIANCE, EQ_BONUS
+    columns:
+      - name: date_key
+        description: "Quota date key (YYYYMMDD format)"
+      - name: metric_key
+        description: "Unique metric identifier"
+      - name: metric_value
+        description: "The metric value"
+      - name: employee_key
+        description: "Foreign key to dim_employee"
+      - name: territory_key
+        description: "Foreign key to dim_territory"
