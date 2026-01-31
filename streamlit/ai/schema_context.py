@@ -33,9 +33,62 @@ class SchemaContext:
         self._metrics_cache: Optional[pd.DataFrame] = None
         self._tables_cache: Optional[dict] = None
         self._yaml_schemas_cache: Optional[dict] = None
+        self._dbt_profile_cache: Optional[dict] = None
         
-        # Path to dbt models directory (relative to streamlit/)
-        self.dbt_models_path = Path(__file__).parent.parent.parent / 'dbt' / 'models'
+        # Path to dbt directory (relative to streamlit/)
+        self.dbt_path = Path(__file__).parent.parent.parent / 'dbt'
+        self.dbt_models_path = self.dbt_path / 'models'
+    
+    def load_dbt_profile(self) -> dict:
+        """
+        Load dbt profile configuration from profiles.yml.
+        
+        Returns:
+            Dictionary with database, schema, and other connection details
+        """
+        if self._dbt_profile_cache is not None:
+            return self._dbt_profile_cache
+        
+        if not YAML_AVAILABLE:
+            return {'database': 'data_warehouse', 'schema': 'dbt'}
+        
+        profiles_path = self.dbt_path / 'profiles.yml'
+        
+        default_profile = {
+            'database': 'data_warehouse',
+            'schema': 'dbt',
+            'host': 'localhost',
+            'port': 5432
+        }
+        
+        if profiles_path.exists():
+            try:
+                with open(profiles_path, 'r') as f:
+                    content = yaml.safe_load(f)
+                    
+                    # Navigate to the target output (usually 'dev')
+                    if content:
+                        for profile_name, profile_config in content.items():
+                            if isinstance(profile_config, dict) and 'outputs' in profile_config:
+                                target = profile_config.get('target', 'dev')
+                                outputs = profile_config.get('outputs', {})
+                                target_config = outputs.get(target, {})
+                                
+                                self._dbt_profile_cache = {
+                                    'profile_name': profile_name,
+                                    'target': target,
+                                    'database': target_config.get('dbname', default_profile['database']),
+                                    'schema': target_config.get('schema', default_profile['schema']),
+                                    'host': target_config.get('host', default_profile['host']),
+                                    'port': target_config.get('port', default_profile['port']),
+                                    'search_path': target_config.get('search_path', target_config.get('schema', 'dbt'))
+                                }
+                                return self._dbt_profile_cache
+            except Exception as e:
+                pass
+        
+        self._dbt_profile_cache = default_profile
+        return self._dbt_profile_cache
     
     def get_metrics_catalog(self) -> pd.DataFrame:
         """
@@ -282,6 +335,16 @@ ORDER BY total_value DESC"""
         metrics_df = self.get_metrics_catalog()
         tables = self.get_table_schemas()
         examples = self.get_example_queries()
+        dbt_profile = self.load_dbt_profile()
+        
+        # Build database connection context
+        db_context = f"""Database: {dbt_profile.get('database', 'data_warehouse')}
+Schema: {dbt_profile.get('schema', 'dbt')}
+Search Path: {dbt_profile.get('search_path', 'dbt')}
+
+Note: All tables are in the '{dbt_profile.get('schema', 'dbt')}' schema. 
+The search_path is already set, so you can query tables directly without schema prefix.
+Example: SELECT * FROM mart_sales (not dbt.mart_sales)"""
         
         # Build metrics context
         metrics_context = ""
@@ -306,6 +369,9 @@ ORDER BY total_value DESC"""
         
         return f"""You are a SQL expert for the AdventureWorks data warehouse running on PostgreSQL.
 Your job is to convert natural language questions into accurate SQL queries.
+
+## Database Connection
+{db_context}
 
 ## Database Schema (with column descriptions)
 {tables_context}
@@ -343,7 +409,13 @@ If the question cannot be answered with the available data, respond with:
         Returns:
             Shortened context string
         """
-        return """Available tables: mart_sales, mart_customer_analytics, mart_product_analytics, 
+        dbt_profile = self.load_dbt_profile()
+        schema = dbt_profile.get('schema', 'dbt')
+        
+        return f"""Database: {dbt_profile.get('database', 'data_warehouse')} | Schema: {schema}
+(Tables can be queried directly without schema prefix)
+
+Available tables: mart_sales, mart_customer_analytics, mart_product_analytics, 
 mart_operations, mart_employee_territory_performance, fact_global_metrics, 
 dim_customer, dim_product, dim_territory, dim_date, dim_metric, dim_employee, dim_vendor,
 fact_sales_order, fact_sales_order_line, fact_inventory, fact_purchase_order, fact_work_order.
