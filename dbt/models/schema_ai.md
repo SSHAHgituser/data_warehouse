@@ -2,7 +2,7 @@
 
 > **Database:** data_warehouse | **Schema:** dbt | Tables can be queried without schema prefix.
 > 
-> *Auto-generated on 2026-01-31 13:49 by generate_ai_schema.py*
+> *Auto-generated on 2026-01-31 13:54 by generate_ai_schema.py*
 
 ## Quick Reference
 
