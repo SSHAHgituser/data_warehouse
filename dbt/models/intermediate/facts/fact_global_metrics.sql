@@ -270,6 +270,49 @@ with all_metrics as (
         metric_key,
         metric_value
     from {{ ref('metrics_employee_quota') }}
+    
+    union all
+    
+    -- ============================================
+    -- DERIVED / STRATEGIC METRICS (L3-L5)
+    -- Company-wide aggregates for KPIs and strategic metrics
+    -- ============================================
+    select
+        date_key,
+        report_date,
+        source_table,
+        source_record_id,
+        -- Core dimension keys (all null - company-wide aggregates)
+        cast(null as bigint) as customer_key,
+        cast(null as bigint) as product_key,
+        cast(null as bigint) as employee_key,
+        cast(null as bigint) as territory_key,
+        cast(null as bigint) as vendor_key,
+        cast(null as bigint) as location_key,
+        -- Additional dimension keys
+        cast(null as bigint) as ship_method_key,
+        cast(null as bigint) as credit_card_key,
+        cast(null as bigint) as special_offer_key,
+        cast(null as bigint) as scrap_reason_key,
+        cast(null as bigint) as parent_order_id,
+        -- Status columns ('All' - company-wide)
+        'All' as online_order_flag,
+        'All' as has_discount,
+        'All' as inventory_status,
+        'All' as order_status,
+        'All' as delivery_status,
+        'All' as quota_status,
+        -- Context columns
+        'All' as location_name,
+        'All' as scrap_reason_name,
+        cast(null as numeric) as safety_stock_level,
+        cast(null as numeric) as reorder_point,
+        cast(null as numeric) as number_of_operations,
+        cast(null as numeric) as commission_pct,
+        -- Metric columns
+        metric_key,
+        metric_value
+    from {{ ref('metrics_derived') }}
 )
 
 select

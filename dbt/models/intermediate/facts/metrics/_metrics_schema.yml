@@ -203,3 +203,33 @@ models:
         description: "'Achieved', 'Near Target', 'Below Target'"
       - name: commission_pct
         description: "Commission percentage"
+
+  - name: metrics_derived
+    description: |
+      Derived strategic metrics (L3-L5) calculated from operational data.
+      Company-wide aggregates for KPIs and executive dashboards.
+      Granularity: One row per metric (no dimension breakdowns).
+      
+      Metrics:
+      - TOTAL_REVENUE: Sum of all sales order revenue
+      - GROSS_PROFIT: Sum of all line item profits
+      - GROSS_MARGIN: Gross profit as % of revenue
+      - INVENTORY_TURNOVER: Estimated inventory turns
+      - CUSTOMER_SATISFACTION: Composite delivery score
+      - PRODUCTION_EFFICIENCY: Production cost efficiency score
+      - SUPPLIER_QUALITY: 100 - avg rejection rate
+      - SUPPLIER_RELIABILITY: Average fulfillment rate
+      - SALES_PERFORMANCE: Average quota achievement
+    columns:
+      - name: date_key
+        description: "Report date key (YYYYMMDD format)"
+      - name: report_date
+        description: "Snapshot date"
+      - name: source_table
+        description: "Always 'derived'"
+      - name: source_record_id
+        description: "Always 1 (single aggregate row)"
+      - name: metric_key
+        description: "Metric identifier (joins to dim_metric)"
+      - name: metric_value
+        description: "Calculated aggregate value"
