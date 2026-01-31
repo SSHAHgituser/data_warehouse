@@ -247,7 +247,7 @@ models:
       Unified metrics fact table - "tall" format with one row per metric value.
       Consolidates metrics from all fact tables for cross-domain analytics.
       
-      Joins to dim_metric for: metric_name, metric_category, metric_unit, metric_level
+      Contains metric_key (FK to dim_metric) - use mart_metrics for metric names/categories.
       Uses 'All' for dimension columns not applicable to a metric type.
     columns:
       # Primary key
@@ -258,17 +258,9 @@ models:
         description: "Date key (YYYYMMDD) - FK to dim_date"
       - name: report_date
         description: "Snapshot date"
-      # Metric info (from dim_metric)
+      # Metric key (FK only - join with dim_metric or use mart_metrics)
       - name: metric_key
-        description: "Metric identifier - FK to dim_metric"
-      - name: metric_name
-        description: "From dim_metric"
-      - name: metric_category
-        description: "From dim_metric"
-      - name: metric_unit
-        description: "From dim_metric"
-      - name: metric_level
-        description: "From dim_metric"
+        description: "Metric identifier - FK to dim_metric (use mart_metrics for names)"
       # Source info
       - name: source_table
         description: "Source fact table name"

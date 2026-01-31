@@ -23,3 +23,11 @@ export DBT_PROFILES_DIR="$SCRIPT_DIR"
 # Run dbt with all passed arguments
 dbt "$@"
 
+# After successful dbt run/build, regenerate AI schema
+# This keeps the AI context in sync with your dbt models
+if [[ "$1" == "run" || "$1" == "build" ]]; then
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    python scripts/generate_ai_schema.py
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+fi

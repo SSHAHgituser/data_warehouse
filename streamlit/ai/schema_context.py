@@ -22,22 +22,49 @@ except ImportError:
 class SchemaContext:
     """Loads and manages schema context for the AI assistant."""
     
-    def __init__(self, conn):
+    def __init__(self, conn, use_markdown: bool = True):
         """
         Initialize with database connection.
         
         Args:
             conn: psycopg2 database connection
+            use_markdown: If True, use optimized schema_ai.md (fewer tokens, lower cost)
         """
         self.conn = conn
+        self.use_markdown = use_markdown
         self._metrics_cache: Optional[pd.DataFrame] = None
         self._tables_cache: Optional[dict] = None
         self._yaml_schemas_cache: Optional[dict] = None
         self._dbt_profile_cache: Optional[dict] = None
+        self._markdown_schema_cache: Optional[str] = None
         
         # Path to dbt directory (relative to streamlit/)
         self.dbt_path = Path(__file__).parent.parent.parent / 'dbt'
         self.dbt_models_path = self.dbt_path / 'models'
+    
+    def load_markdown_schema(self) -> str:
+        """
+        Load the optimized markdown schema file for AI context.
+        This is more token-efficient than loading YAML files.
+        
+        Returns:
+            Markdown content as string, or empty string if not found
+        """
+        if self._markdown_schema_cache is not None:
+            return self._markdown_schema_cache
+        
+        schema_md_path = self.dbt_models_path / 'schema_ai.md'
+        
+        if schema_md_path.exists():
+            try:
+                with open(schema_md_path, 'r') as f:
+                    self._markdown_schema_cache = f.read()
+                    return self._markdown_schema_cache
+            except Exception as e:
+                pass
+        
+        self._markdown_schema_cache = ""
+        return self._markdown_schema_cache
     
     def load_dbt_profile(self) -> dict:
         """
@@ -319,19 +346,45 @@ ORDER BY quota_achievement_percent DESC"""
        SUM(i.inventory_value) as total_value,
        COUNT(CASE WHEN i.inventory_status = 'Out of Stock' THEN 1 END) as out_of_stock_count
 FROM fact_inventory i
-JOIN dim_product p ON i.product_key = p.productid
+JOIN dim_product p ON i.product_key = p.productid  -- Note: dim_product PK is productid, not product_key
 GROUP BY p.category_name
 ORDER BY total_value DESC"""
+            ),
+            (
+                "Show me metrics with territory and product details",
+                """SELECT dm.metric_name, fgm.metric_value, dt.territory_name, dp.product_name
+FROM fact_global_metrics fgm
+JOIN dim_metric dm ON fgm.metric_key = dm.metric_key
+LEFT JOIN dim_territory dt ON fgm.territory_key = dt.territoryid  -- PK is territoryid
+LEFT JOIN dim_product dp ON fgm.product_key = dp.productid        -- PK is productid
+WHERE fgm.metric_value IS NOT NULL
+ORDER BY dm.metric_name
+LIMIT 100"""
             )
         ]
     
     def build_system_prompt(self) -> str:
         """
         Build the complete system prompt for SQL generation.
+        Uses markdown schema if available (more token-efficient).
         
         Returns:
             System prompt string with full context
         """
+        # Try to use optimized markdown schema first (saves ~30% tokens)
+        if self.use_markdown:
+            markdown_schema = self.load_markdown_schema()
+            if markdown_schema:
+                return f"""You are a SQL expert for the AdventureWorks data warehouse on PostgreSQL.
+Convert natural language questions into accurate SQL queries.
+
+{markdown_schema}"""
+        
+        # Fallback to YAML-based schema (more tokens, but works without schema_ai.md)
+        return self._build_yaml_based_prompt()
+    
+    def _build_yaml_based_prompt(self) -> str:
+        """Build system prompt from YAML files (fallback method)."""
         metrics_df = self.get_metrics_catalog()
         tables = self.get_table_schemas()
         examples = self.get_example_queries()
@@ -387,11 +440,24 @@ Your job is to convert natural language questions into accurate SQL queries.
 5. Use LIMIT for top-N queries (default to 10-20 for large result sets)
 6. Handle NULL values appropriately with COALESCE or WHERE filters
 7. Use proper date filtering for time-based queries
-8. Prefer using mart tables (mart_sales, mart_customer_analytics, etc.) which have pre-joined dimensions
+8. **STRONGLY PREFER using mart tables** (mart_sales, mart_customer_analytics, etc.) which have ALL dimensions pre-joined - AVOID joining fact and dim tables manually
 9. Format column names to be human-readable in output using AS aliases
 10. For time series queries, use order_year and order_month columns in mart_sales
 11. Use customer_segment, customer_status, churn_risk columns for customer analysis
 12. Use category_name, subcategory_name for product analysis
+
+## Join Key Reference (ONLY if you must join manually - prefer mart tables instead):
+- dim_customer: PRIMARY KEY is `customerid` (join with customer_key)
+- dim_product: PRIMARY KEY is `productid` (join with product_key)
+- dim_territory: PRIMARY KEY is `territoryid` (join with territory_key)
+- dim_employee: PRIMARY KEY is `employee_id` (join with employee_key)
+- dim_vendor: PRIMARY KEY is `vendor_id` (join with vendor_key)
+- dim_date: PRIMARY KEY is `date_key` (join with date_key, order_date_key, etc.)
+- dim_metric: PRIMARY KEY is `metric_key` (join with metric_key)
+
+Example correct join:
+  JOIN dim_territory dt ON fgm.territory_key = dt.territoryid  -- NOT dt.territory_key!
+  JOIN dim_customer dc ON fgm.customer_key = dc.customerid      -- NOT dc.customer_key!
 
 ## Example Queries:
 {examples_context}
@@ -405,37 +471,19 @@ If the question cannot be answered with the available data, respond with:
     def get_quick_context(self) -> str:
         """
         Get a condensed context for follow-up questions.
+        Optimized for minimal token usage.
         
         Returns:
             Shortened context string
         """
-        dbt_profile = self.load_dbt_profile()
-        schema = dbt_profile.get('schema', 'dbt')
-        
-        return f"""Database: {dbt_profile.get('database', 'data_warehouse')} | Schema: {schema}
-(Tables can be queried directly without schema prefix)
+        return """Tables: mart_sales (main), mart_customer_analytics, mart_product_analytics, mart_operations, mart_employee_territory_performance
 
-Available tables: mart_sales, mart_customer_analytics, mart_product_analytics, 
-mart_operations, mart_employee_territory_performance, fact_global_metrics, 
-dim_customer, dim_product, dim_territory, dim_date, dim_metric, dim_employee, dim_vendor,
-fact_sales_order, fact_sales_order_line, fact_inventory, fact_purchase_order, fact_work_order.
+mart_sales columns: salesorderid, order_date, order_year, order_month, customer_name, customer_segment, product_name, category_name, territory_name, countryregioncode, order_total, net_line_amount, total_profit, orderqty
 
-Key fields in mart_sales:
-- salesorderid, salesorderdetailid: Order identifiers
-- order_date, order_year, order_month, order_season: Time dimensions  
-- customer_key, customer_name, customer_segment, customer_status: Customer info
-- product_key, product_name, category_name, subcategory_name: Product info
-- territory_key, territory_name, countryregioncode, territory_group: Geography
-- order_total, net_line_amount, total_profit: Financial metrics
-- orderqty, unitprice, unitpricediscount: Line item details
+mart_customer_analytics: customerid, customer_name, lifetime_value, order_count, customer_segment, churn_risk (High/Medium/Low), rfm_category, days_since_last_order
 
-Key fields in mart_customer_analytics:
-- customerid, customer_name, lifetime_value, order_count, avg_order_value
-- customer_segment, customer_status, churn_risk, rfm_category
-- days_since_last_order, first_order_date, last_order_date
+mart_product_analytics: productid, product_name, category_name, total_revenue, profit_margin_percent, inventory_status
 
-Key fields in mart_product_analytics:
-- productid, product_name, category_name, total_revenue, profit_margin_percent
-- inventory_status, monthly_sales_velocity, inventory_turnover_ratio
+⚠️ Join PKs: dim_customer.customerid, dim_product.productid, dim_territory.territoryid, dim_employee.employee_id
 
-Return ONLY the SQL query, no explanations."""
+USE mart tables - they're pre-joined! Return ONLY SQL."""

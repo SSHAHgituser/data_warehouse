@@ -99,3 +99,49 @@ models:
       - name: territory_performance
         description: "Territory performance category"
 
+  - name: mart_metrics
+    description: |
+      Metrics mart - joins fact_global_metrics with dim_metric for complete metric information.
+      Use this table for AI analytics queries, KPI dashboards, and cross-domain metric analysis.
+      Includes metric names, categories, units, targets, and alert criteria from dim_metric.
+    columns:
+      - name: metric_record_id
+        description: "Surrogate key"
+      - name: date_key
+        description: "Date key (YYYYMMDD)"
+      - name: report_date
+        description: "Snapshot date"
+      - name: metric_key
+        description: "Metric identifier (FK to dim_metric)"
+      - name: metric_name
+        description: "Human-readable metric name"
+      - name: metric_description
+        description: "Business definition of the metric"
+      - name: metric_category
+        description: "Category: Sales, Inventory, HR, Operations, etc."
+      - name: metric_unit
+        description: "Unit: USD, Count, Percent, Days"
+      - name: metric_level
+        description: "Hierarchy level: L1-L5"
+      - name: metric_parent
+        description: "Parent metric key (for drill-down)"
+      - name: metric_target
+        description: "Target/goal for this metric"
+      - name: alert_criteria
+        description: "Conditions for alerting"
+      - name: recommended_actions
+        description: "Suggested actions when metric is off-target"
+      - name: metric_value
+        description: "The numeric metric value"
+      - name: source_table
+        description: "Source fact table name"
+      - name: customer_key
+        description: "FK to dim_customer"
+      - name: product_key
+        description: "FK to dim_product"
+      - name: employee_key
+        description: "FK to dim_employee"
+      - name: territory_key
+        description: "FK to dim_territory"
+      - name: vendor_key
+        description: "FK to dim_vendor"

@@ -9,14 +9,14 @@
     Each UNION ALL section explicitly maps columns from source metrics models,
     using 'All' for dimension columns not applicable to that metric type.
     
-    metric_name, metric_category, metric_unit, and metric_level are pulled from dim_metric 
-    (single source of truth) after the union, ensuring consistency across all metrics.
+    NOTE: This fact table contains only metric_key (FK to dim_metric).
+    For metric names/categories, use mart_metrics which joins with dim_metric.
     
     This enables:
     - Flexible cross-domain analytics
-    - Consistent metric definitions
     - Easy filtering (WHERE column = 'value' OR column = 'All')
     - Time-series analysis across all metrics
+    - Lightweight fact table without denormalized metric info
 #}
 
 with all_metrics as (
@@ -323,12 +323,8 @@ select
     am.date_key,
     am.report_date,
     
-    -- Metric info from dim_metric (single source of truth)
+    -- Metric key (FK to dim_metric - join in mart_metrics for names/categories)
     am.metric_key,
-    dm.metric_name,
-    dm.metric_category,
-    dm.metric_unit,
-    dm.metric_level,
     
     -- Source info
     am.source_table,
@@ -372,6 +368,5 @@ select
     current_timestamp as created_at
 
 from all_metrics am
-left join {{ ref('dim_metric') }} dm on am.metric_key = dm.metric_key
 where am.metric_value is not null
   and am.metric_value != 0
